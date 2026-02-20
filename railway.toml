@@ -1,0 +1,9 @@
+# Railway: build the frontend, then run the Node server (serves API + React app)
+[build]
+builder = "nixpacks"
+buildCommand = "npm install && npm run build"
+
+[deploy]
+startCommand = "cd server && node index.js"
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 10

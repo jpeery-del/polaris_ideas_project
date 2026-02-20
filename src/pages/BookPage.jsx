@@ -45,7 +45,7 @@ export default function BookPage() {
     return (
       <div className="book-page">
         <p>Book not found.</p>
-        <Link to="/">← Back to Books</Link>
+        <Link to="/books">← Back to Book notes</Link>
       </div>
     )
   }
@@ -97,7 +97,7 @@ export default function BookPage() {
   return (
     <div className="book-page">
       <nav className="breadcrumb">
-        <Link to="/">Books</Link>
+        <Link to="/books">Book notes</Link>
         <span className="sep">/</span>
         <span>{currentBook.title}</span>
       </nav>
@@ -151,7 +151,7 @@ export default function BookPage() {
           </div>
         )}
         <div className="book-page-actions">
-          <Link to="/" className="btn btn-secondary">← All books</Link>
+          <Link to="/books" className="btn btn-secondary">← All book notes</Link>
           <button type="button" className="btn danger" onClick={handleDeleteBook}>Delete book</button>
         </div>
       </header>

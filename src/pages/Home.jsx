@@ -31,7 +31,7 @@ export default function Home() {
   return (
     <div className="books-page single-page">
       <header className="books-header">
-        <h1>Books</h1>
+        <h1>Book notes</h1>
         <p className="books-desc">
           Add a book, then add sections under it (e.g. Book 1, Book 2, …). For each section add events, questions, arguments, and notes.
         </p>
@@ -85,7 +85,7 @@ export default function Home() {
 
       <section className="books-list-section">
         {books.length === 0 ? (
-          <p className="empty-hint">No books yet. Add an entry above to create a book, then add sections and notes.</p>
+          <p className="empty-hint">No book notes yet. Add an entry above to create a book, then add sections and notes.</p>
         ) : (
           <div className="book-list">
             {books.map(book => (

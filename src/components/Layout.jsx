@@ -1,6 +1,16 @@
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+
+const nav = [
+  { to: '/', label: 'Welcome' },
+  { to: '/books', label: 'Book notes' },
+  { to: '/essays', label: 'Essays' },
+]
 
 export default function Layout({ children }) {
+  const location = useLocation()
+  const { user, signOut } = useAuth()
+
   return (
     <div className="layout">
       <header className="header">
@@ -8,6 +18,23 @@ export default function Layout({ children }) {
           <span className="logo-icon">◇</span>
           Platonic Study
         </Link>
+        <nav className="nav">
+          {nav.map(({ to, label }) => (
+            <Link
+              key={to}
+              to={to}
+              className={`nav-link ${location.pathname === to || (to === '/books' && (location.pathname === '/books' || location.pathname.startsWith('/book/'))) || (to === '/essays' && location.pathname.startsWith('/essays')) ? 'active' : ''}`}
+            >
+              {label}
+            </Link>
+          ))}
+          {user && (
+            <span className="header-user">
+              <span className="header-user-name">{user.username}</span>
+              <button type="button" className="btn-icon header-signout" onClick={signOut}>Sign out</button>
+            </span>
+          )}
+        </nav>
       </header>
       <main className="main">
         {children}

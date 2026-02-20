@@ -41,6 +41,21 @@ npm run preview
 
 For production, run the server (e.g. `node server/index.js`) and set `JWT_SECRET` and optionally `PORT`. Point the frontend at your API (same origin or CORS).
 
+## Deploy on Railway (e.g. dialoguebuddy.com)
+
+1. **Connect the repo** and deploy; the app uses `railway.toml` (build frontend, then run `server/index.js`).
+2. **Environment:** In Railway → your service → Variables, set `JWT_SECRET` (required for auth).
+3. **Custom domain so www works:** Railway treats the root domain and `www` as different. Add **both**:
+   - In Railway → your service → **Settings → Domains**, add:
+     - `dialoguebuddy.com`
+     - `www.dialoguebuddy.com`
+   - Railway will show a **CNAME target** (e.g. `xxx.up.railway.app`). In your DNS provider:
+     - **www:** create a **CNAME** record: name `www` → value = Railway’s CNAME target.
+     - **Root (optional):** if your DNS supports CNAME at root (or “CNAME flattening”), point `@` to the same target; otherwise use the A/AAAA records Railway suggests.
+4. Wait for DNS to propagate (up to 48 hours; often minutes). Then both `https://dialoguebuddy.com` and `https://www.dialoguebuddy.com` should open your app.
+
+If only the root works and www doesn’t, add `www.dialoguebuddy.com` as a separate domain in Railway and set the `www` CNAME as above.
+
 ## Backend API
 
 - `POST /api/register` — Body: `{ "username", "password" }`. Username ≥2 chars, password ≥6. Returns `{ user, token }`.

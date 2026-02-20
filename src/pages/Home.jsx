@@ -1,33 +1,107 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { tetralogies } from '../data/dialogues'
+import {
+  getAllBooks,
+  createBook,
+} from '../data/books'
 
 export default function Home() {
+  const [version, setVersion] = useState(0)
+  const books = getAllBooks()
+  const [newTitle, setNewTitle] = useState('')
+  const [newAuthor, setNewAuthor] = useState('')
+  const [newTranslator, setNewTranslator] = useState('')
+  const [newPublisher, setNewPublisher] = useState('')
+  const [adding, setAdding] = useState(false)
+
+  const refresh = () => setVersion(v => v + 1)
+
+  const handleCreateBook = (e) => {
+    e.preventDefault()
+    if (!newTitle.trim()) return
+    createBook(newTitle, newAuthor, newTranslator, newPublisher)
+    setNewTitle('')
+    setNewAuthor('')
+    setNewTranslator('')
+    setNewPublisher('')
+    setAdding(false)
+    refresh()
+  }
+
   return (
-    <div className="home">
-      <section className="hero">
-        <h1>Dialogues of Plato</h1>
-        <p className="tagline">Read, reflect, and study the dialogues by tetralogy.</p>
+    <div className="books-page single-page">
+      <header className="books-header">
+        <h1>Books</h1>
+        <p className="books-desc">
+          Add a book, then add sections under it (e.g. Book 1, Book 2, …). For each section add events, questions, arguments, and notes.
+        </p>
+      </header>
+
+      <section className="books-form-section">
+        {adding ? (
+          <form onSubmit={handleCreateBook} className="book-add-form">
+            <input
+              type="text"
+              className="form-input"
+              placeholder="Book title (e.g. Republic)"
+              value={newTitle}
+              onChange={e => setNewTitle(e.target.value)}
+              autoFocus
+            />
+            <input
+              type="text"
+              className="form-input"
+              placeholder="Author (e.g. Plato)"
+              value={newAuthor}
+              onChange={e => setNewAuthor(e.target.value)}
+            />
+            <input
+              type="text"
+              className="form-input"
+              placeholder="Translator (optional)"
+              value={newTranslator}
+              onChange={e => setNewTranslator(e.target.value)}
+            />
+            <input
+              type="text"
+              className="form-input"
+              placeholder="Publisher (optional)"
+              value={newPublisher}
+              onChange={e => setNewPublisher(e.target.value)}
+            />
+            <div className="form-actions">
+              <button type="button" className="btn btn-secondary" onClick={() => { setAdding(false); setNewTitle(''); setNewAuthor(''); setNewTranslator(''); setNewPublisher('') }}>
+                Cancel
+              </button>
+              <button type="submit" className="btn btn-primary">Add book</button>
+            </div>
+          </form>
+        ) : (
+          <button type="button" className="btn btn-primary" onClick={() => setAdding(true)}>
+            Add entry (book)
+          </button>
+        )}
       </section>
 
-      <div className="tetralogies">
-        {tetralogies.map((t) => (
-          <section key={t.name} className="tetralogy">
-            <h2 className="tetralogy-title">{t.name}</h2>
-            <p className="tetralogy-theme">{t.theme}</p>
-            <ul className="dialogue-list">
-              {t.dialogues.map((d) => (
-                <li key={d.id}>
-                  <Link to={`/dialogue/${d.id}`} className="dialogue-card">
-                    <span className="dialogue-name">{d.title}</span>
-                    <span className="dialogue-theme">{d.theme}</span>
-                    <span className="dialogue-short">{d.short}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ))}
-      </div>
+      <section className="books-list-section">
+        {books.length === 0 ? (
+          <p className="empty-hint">No books yet. Add an entry above to create a book, then add sections and notes.</p>
+        ) : (
+          <div className="book-list">
+            {books.map(book => (
+              <Link key={book.id} to={`/book/${book.id}`} className="book-card-link">
+                <span className="book-card-title">{book.title}</span>
+                {(book.author ?? '') && <span className="book-card-meta-line">{book.author}</span>}
+                {(book.translator ?? '') && <span className="book-card-meta-line">{book.translator}</span>}
+                {(book.publisher ?? '') && <span className="book-card-meta-line">{book.publisher}</span>}
+                <span className="book-card-meta">
+                  {(book.sections || []).length} section{(book.sections || []).length !== 1 ? 's' : ''}
+                </span>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   )
 }

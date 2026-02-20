@@ -53,7 +53,7 @@ export function ensureDataDir() {
     }
   } catch (e) {
     console.error('Data directory not writable:', DATA_DIR, e.message)
-    throw e
+    // Don't throw: allow server to start so the app loads (auth will fail until data dir is writable)
   }
 }
 

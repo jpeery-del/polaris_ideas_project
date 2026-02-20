@@ -79,6 +79,9 @@ const distPath = path.join(__dirname, '..', 'dist')
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath))
   app.get('*', (req, res) => res.sendFile(path.join(distPath, 'index.html')))
+} else {
+  console.warn('No dist/ folder found; frontend will not be served. Check build output.')
+  app.get('/', (req, res) => res.status(503).send('App not built. Check deploy logs.'))
 }
 
 ensureDataDir()

@@ -15,6 +15,9 @@ const PORT = process.env.PORT || 3001
 app.use(cors({ origin: true, credentials: true }))
 app.use(express.json())
 
+// Health check (for Railway and load balancers)
+app.get('/health', (req, res) => res.status(200).json({ ok: true }))
+
 // Register: POST /api/register { username, password }
 app.post('/api/register', async (req, res) => {
   try {
@@ -88,4 +91,7 @@ ensureDataDir()
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`)
+}).on('error', (err) => {
+  console.error('Server failed to start:', err.message)
+  process.exit(1)
 })

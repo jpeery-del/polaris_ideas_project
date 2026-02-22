@@ -56,6 +56,45 @@ For production, run the server (e.g. `node server/index.js`) and set `JWT_SECRET
 
 If only the root works and www doesn’t, add `www.dialoguebuddy.com` as a separate domain in Railway and set the `www` CNAME as above.
 
+### If www.dialoguebuddy.com shows GoDaddy “Under Construction”
+
+Railway is working when the deployment is successful and DNS shows a green check. If you still see GoDaddy’s page:
+
+1. **Turn off GoDaddy forwarding/parked page**
+   - In GoDaddy: **My Products** → **DNS** (or **Domain Settings**) for `dialoguebuddy.com`.
+   - Remove or disable any **Domain Forwarding** from `www` to another URL.
+   - Disable any **Parked Page**, **Coming Soon**, or **Under Construction** page for `www` so DNS (CNAME) is used instead.
+
+2. **Confirm DNS at GoDaddy**
+   - In **DNS Management** for `dialoguebuddy.com`, ensure:
+     - **CNAME** — Name: `www` → Value: Railway’s target (e.g. `02gwprj3.up.railway.app` — use the value from Railway → Settings → Domains → “Configure DNS Records”).
+     - **TXT** — Name: `_railway-verify.www` → Value: the `railway-verify=...` string Railway shows (for verification).
+   - Remove any conflicting **A** record for `www` that points to GoDaddy IPs.
+
+3. **Cache and propagation**
+   - Try in an **Incognito/Private** window or another device/network.
+   - DNS can take up to 48 hours to propagate; if you just changed records, wait and retry.
+
+4. **Confirm both domains in Railway**
+   - Railway → your service → **Settings** → **Domains**: add both `dialoguebuddy.com` and `www.dialoguebuddy.com` so both resolve to your app.
+
+### If www.dialoguebuddy.com shows Railway “502 Bad Gateway”
+
+Traffic is reaching Railway but the app isn’t responding. Do this:
+
+1. **Check Deploy Logs** (Railway → your service → **Deployments** → open latest → **Deploy Logs**).
+   - You should see: `Starting server...`, `Static dist: ... found` (or `MISSING`), then `Server running on port X`. If you see `MISSING` for dist, the build didn’t produce the frontend; fix the build. If you see a crash or error before “Server running”, fix that (e.g. missing env, module error).
+2. **Port must match.** The app uses `process.env.PORT` (Railway sets this). In Railway → your service → **Settings** → **Networking**, the “Port” must match (e.g. if the log says “port 3001”, set Port to **3001**). Don’t set a custom `PORT` in Variables unless you also set that same port in Networking.
+3. **Redeploy** after any change (Variables, Settings, or code), then try again in an incognito window.
+
+### If dialoguebuddy.com (no www) still shows GoDaddy “Launching Soon”
+
+You want the **root** domain to send people to your app:
+
+1. **Forward root → www.** In GoDaddy → **Domain** → **Forwarding**, add a forward: **dialoguebuddy.com** → **https://www.dialoguebuddy.com** (permanent). The *source* must be the root (e.g. “dialoguebuddy.com” or “@”), and the *destination* must be `https://www.dialoguebuddy.com`.
+2. **Remove the old A record** for `@` that pointed to “WebsiteBuilder Site” (if you haven’t already).
+3. **Wait a few minutes** and try `https://dialoguebuddy.com` in incognito. If it still shows GoDaddy, wait up to an hour for propagation and double-check the forwarding target URL.
+
 ## Backend API
 
 - `POST /api/register` — Body: `{ "username", "password" }`. Username ≥2 chars, password ≥6. Returns `{ user, token }`.

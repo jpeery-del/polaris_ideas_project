@@ -12,6 +12,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const app = express()
 const PORT = process.env.PORT || 3001
 
+// Log early so Railway deploy logs show startup progress
+console.log('Starting server...', { PORT, NODE_ENV: process.env.NODE_ENV })
+
 app.use(cors({ origin: true, credentials: true }))
 app.use(express.json())
 
@@ -79,7 +82,9 @@ app.get('/api/me', authMiddleware, (req, res) => {
 
 // Serve built React app when dist exists (production / Railway)
 const distPath = path.join(__dirname, '..', 'dist')
-if (fs.existsSync(distPath)) {
+const distExists = fs.existsSync(distPath)
+console.log('Static dist:', distPath, distExists ? 'found' : 'MISSING')
+if (distExists) {
   app.use(express.static(distPath))
   app.get('*', (req, res) => res.sendFile(path.join(distPath, 'index.html')))
 } else {
@@ -90,7 +95,7 @@ if (fs.existsSync(distPath)) {
 ensureDataDir()
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on port ${PORT}`)
+  console.log(`Server running on port ${PORT} (Railway will send traffic here)`)
 }).on('error', (err) => {
   console.error('Server failed to start:', err.message)
   process.exit(1)

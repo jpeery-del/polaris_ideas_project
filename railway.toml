@@ -4,6 +4,6 @@ builder = "nixpacks"
 buildCommand = "npm install && npm run build"
 
 [deploy]
-startCommand = "cd server && node index.js"
+startCommand = "cd server && node run.js"
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 10

@@ -1,5 +1,30 @@
 const STORAGE_KEY_BOOKS = 'platonic-study-books'
 
+/** Tab keys for philosophical book workspace (persisted in book.tabContent). */
+export const BOOK_TAB_KEYS = [
+  'overview',
+  'summary',
+  'keyArguments',
+  'quotations',
+  'philosophicalAnalysis',
+  'questionsObjections',
+  'crossConnections',
+]
+
+export const BOOK_TAB_LABELS = {
+  overview: 'Overview',
+  summary: 'Summary',
+  keyArguments: 'Key Arguments',
+  quotations: 'Quotations',
+  philosophicalAnalysis: 'Philosophical Analysis',
+  questionsObjections: 'Questions & Objections',
+  crossConnections: 'Cross-Connections',
+}
+
+function defaultTabContent() {
+  return BOOK_TAB_KEYS.reduce((acc, key) => ({ ...acc, [key]: '' }), {})
+}
+
 export const NOTE_TYPES = [
   { id: 'summary', label: 'Summary notes' },
   { id: 'key_concept', label: 'Key concepts' },
@@ -37,13 +62,20 @@ function loadBooks() {
           : [sec]
       )
       sections = expanded.map((sec, i) => ({ ...sec, order: i }))
+      const tabContent = book.tabContent && typeof book.tabContent === 'object'
+        ? { ...defaultTabContent(), ...book.tabContent }
+        : defaultTabContent()
       return {
         ...book,
         author: book.author ?? '',
         translator: book.translator ?? '',
         publisher: book.publisher ?? '',
+        year: book.year ?? '',
+        edition: book.edition ?? '',
+        tags: Array.isArray(book.tags) ? book.tags : [],
         customTypes: book.customTypes || [],
         sections,
+        tabContent,
       }
     })
     if (didMigrate) saveBooks(result)
@@ -86,20 +118,30 @@ const DEFAULT_SECTIONS = [
   'Argument map',
 ]
 
-export function createBook(title, author = '', translator = '', publisher = '') {
+/**
+ * Create a new philosophy book workspace.
+ * @param {Object} opts - { title, author, year, edition, translator, tags }
+ */
+export function createBook(opts) {
+  const title = typeof opts === 'string' ? opts : (opts?.title ?? '')
+  const author = typeof opts === 'string' ? '' : (opts?.author ?? '')
+  const year = typeof opts === 'string' ? '' : (opts?.year ?? '')
+  const edition = typeof opts === 'string' ? '' : (opts?.edition ?? '')
+  const translator = typeof opts === 'string' ? '' : (opts?.translator ?? '')
+  const publisher = typeof opts === 'string' ? '' : (opts?.publisher ?? '')
+  const tags = Array.isArray(opts?.tags) ? opts.tags : []
   const book = {
     id: crypto.randomUUID(),
-    title: title.trim() || 'Untitled book',
+    title: (title || '').trim() || 'Untitled book',
     author: (author || '').trim(),
     translator: (translator || '').trim(),
     publisher: (publisher || '').trim(),
-    sections: DEFAULT_SECTIONS.map((sectionTitle, order) => ({
-      id: crypto.randomUUID(),
-      title: sectionTitle,
-      notes: [],
-      order,
-    })),
+    year: (year || '').toString().trim(),
+    edition: (edition || '').toString().trim(),
+    tags: tags.filter(Boolean).map(t => (typeof t === 'string' ? t : '').trim()).filter(Boolean),
+    sections: [],
     customTypes: [],
+    tabContent: defaultTabContent(),
     createdAt: new Date().toISOString(),
   }
   saveBook(book)

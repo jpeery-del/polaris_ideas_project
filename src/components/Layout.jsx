@@ -20,20 +20,24 @@ export default function Layout({ children }) {
           Dialogue Buddy
         </Link>
         <nav className="nav">
-          {nav.map(({ to, label }) => (
-            <Link
-              key={to}
-              to={to}
-              className={`nav-link ${location.pathname === to || (to === '/books' && (location.pathname === '/books' || location.pathname.startsWith('/book/'))) || (to === '/themes' && (location.pathname === '/themes' || location.pathname.startsWith('/themes/'))) || (to === '/essays' && location.pathname.startsWith('/essays')) ? 'active' : ''}`}
-            >
-              {label}
-            </Link>
-          ))}
-          {user && (
-            <span className="header-user">
-              <span className="header-user-name">{user.username}</span>
-              <button type="button" className="btn-icon header-signout" onClick={signOut}>Sign out</button>
-            </span>
+          {user ? (
+            <>
+              {nav.map(({ to, label }) => (
+                <Link
+                  key={to}
+                  to={to}
+                  className={`nav-link ${location.pathname === to || (to === '/books' && (location.pathname === '/books' || location.pathname.startsWith('/book/'))) || (to === '/themes' && (location.pathname === '/themes' || location.pathname.startsWith('/themes/'))) || (to === '/essays' && location.pathname.startsWith('/essays')) ? 'active' : ''}`}
+                >
+                  {label}
+                </Link>
+              ))}
+              <span className="header-user">
+                <span className="header-user-name">{user.username}</span>
+                <button type="button" className="btn-icon header-signout" onClick={signOut}>Sign out</button>
+              </span>
+            </>
+          ) : (
+            <Link to="/signin" className="nav-link nav-signin">Sign in</Link>
           )}
         </nav>
       </header>

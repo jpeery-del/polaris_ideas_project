@@ -99,6 +99,16 @@ button {
   background: rgba(107, 83, 68, 0.15);
   color: var(--accent);
 }
+.nav-signin {
+  margin-left: auto;
+  font-weight: 600;
+  background: var(--accent);
+  color: var(--paper);
+}
+.nav-signin:hover {
+  background: var(--gold);
+  color: var(--paper);
+}
 .header-user {
   display: flex;
   align-items: center;
@@ -163,6 +173,60 @@ button {
   line-height: 1.6;
   margin: 0 0 2rem;
 }
+.welcome-features {
+  text-align: left;
+  max-width: 520px;
+  margin: 0 auto 1.5rem;
+  padding: 1.25rem 1.5rem;
+  background: rgba(107, 83, 68, 0.06);
+  border-radius: 10px;
+  border: 1px solid rgba(107, 83, 68, 0.12);
+}
+.welcome-features-title {
+  font-size: 1.1rem;
+  margin: 0 0 1rem;
+  color: var(--ink);
+  font-weight: 600;
+}
+.welcome-features-content {
+  color: var(--accent-light);
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+.welcome-features-content h3 {
+  font-size: 0.95rem;
+  margin: 1rem 0 0.35rem;
+  color: var(--ink);
+  font-weight: 600;
+}
+.welcome-features-content h3:first-child {
+  margin-top: 0;
+}
+.welcome-features-content p {
+  margin: 0 0 0.5rem;
+}
+.welcome-features-content ul {
+  margin: 0.5rem 0 0.75rem;
+  padding-left: 1.25rem;
+}
+.welcome-features-content li {
+  margin-bottom: 0.4rem;
+}
+.welcome-features-content li:last-child {
+  margin-bottom: 0;
+}
+.welcome-features-close {
+  margin-top: 1rem;
+  margin-bottom: 0;
+  font-style: italic;
+}
+.welcome-signin-trigger {
+  margin-bottom: 1rem;
+}
+.welcome-signin-btn {
+  font-size: 0.9rem;
+  padding: 0.4rem 0.85rem;
+}
 .signin-form {
   max-width: 280px;
   margin: 0 auto 1rem;
@@ -170,6 +234,13 @@ button {
 }
 .signin-form .form-input {
   margin-bottom: 0.75rem;
+}
+.signin-form--compact {
+  margin-top: 0.5rem;
+}
+.signin-form--compact .form-input {
+  font-size: 0.9rem;
+  padding: 0.4rem 0.6rem;
 }
 .signin-form .form-error {
   color: #b54a4a;
@@ -189,6 +260,17 @@ button {
 }
 .btn-text-link:hover {
   color: var(--gold);
+}
+.signin-back {
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+}
+.signin-back a {
+  color: var(--accent);
+  text-decoration: none;
+}
+.signin-back a:hover {
+  text-decoration: underline;
 }
 .welcome-actions {
   display: flex;

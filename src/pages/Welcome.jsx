@@ -1,50 +1,8 @@
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { login, register } from '../api/auth'
 
 export default function Welcome() {
-  const { user, signIn, signOut } = useAuth()
-  const [mode, setMode] = useState('login') // 'login' | 'register'
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setError('')
-    const userStr = username.trim()
-    if (!userStr) {
-      setError('Enter a username')
-      return
-    }
-    if (userStr.length < 2) {
-      setError('Username must be at least 2 characters')
-      return
-    }
-    if (!password) {
-      setError('Enter a password')
-      return
-    }
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters')
-      return
-    }
-    setLoading(true)
-    try {
-      const data = mode === 'login'
-        ? await login(userStr, password)
-        : await register(userStr, password)
-      signIn(data.user, data.token)
-      setUsername('')
-      setPassword('')
-    } catch (err) {
-      setError(err.message || 'Something went wrong')
-    } finally {
-      setLoading(false)
-    }
-  }
+  const { user } = useAuth()
 
   return (
     <div className="welcome-page">
@@ -60,49 +18,54 @@ export default function Welcome() {
               Keep notes on books by section, draft essays, and track ideas, questions, and arguments—all in one place.
             </p>
             <div className="welcome-actions">
-              <Link to="/books" className="btn btn-primary welcome-btn">Book Workspace</Link>
+              <Link to="/books" className="btn btn-secondary welcome-btn">Books</Link>
+              <Link to="/themes" className="btn btn-secondary welcome-btn">Themes</Link>
               <Link to="/essays" className="btn btn-secondary welcome-btn">Essays</Link>
-              <button type="button" className="btn btn-secondary welcome-btn" onClick={signOut}>Sign out</button>
             </div>
           </>
         ) : (
           <>
             <p className="welcome-statement">Welcome to Dialogue Buddy.</p>
             <p className="welcome-desc">
-              Sign in or create an account to organize notes on books, draft essays, and track ideas.
+              Sign in or create an account to get started.
             </p>
-            <form onSubmit={handleSubmit} className="signin-form">
-              <input
-                type="text"
-                className="form-input"
-                placeholder="Username"
-                value={username}
-                onChange={e => { setUsername(e.target.value); setError('') }}
-                autoComplete="username"
-                autoFocus
-              />
-              <input
-                type="password"
-                className="form-input"
-                placeholder="Password"
-                value={password}
-                onChange={e => { setPassword(e.target.value); setError('') }}
-                autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-              />
-              {error && <p className="form-error">{error}</p>}
-              <div className="form-actions">
-                <button type="submit" className="btn btn-primary" disabled={loading}>
-                  {loading ? '…' : mode === 'login' ? 'Sign in' : 'Create account'}
-                </button>
+            <section className="welcome-features" aria-label="Features">
+              <h2 className="welcome-features-title">What you can do</h2>
+              <div className="welcome-features-content">
+                <h3 className="welcome-features-heading">Book workspace</h3>
+                <p>
+                  Create a dedicated workspace for each philosophical text. Add books with full bibliographic details (author, translator, edition, year) and optional tags. Each book gives you structured tabs to work through your reading:
+                </p>
+                <ul>
+                  <li><strong>Overview</strong> — Free-form notes by section (e.g. Book 1, Book 2). Use note types such as summary, key concepts, quotations, questions, and implications, with optional subentries so you can nest and organize as you go.</li>
+                  <li><strong>Summary</strong> — Chapter-by-chapter summaries with page ranges, main theses, and rich-text content that auto-saves as you type.</li>
+                  <li><strong>Key arguments</strong> — Capture arguments with claim, premises, conclusion, assumptions, strengths, and weaknesses. Link arguments to themes for cross-referencing.</li>
+                  <li><strong>Quotations</strong> — Store important passages with text, page numbers, context, and why they matter. Tag and link quotations to themes.</li>
+                  <li><strong>Philosophical analysis</strong> — Your own analysis in expandable sections with rich text.</li>
+                  <li><strong>Questions & objections</strong> — Track questions and objections that arise from the text.</li>
+                  <li><strong>Cross-connections</strong> — Connect the book to shared themes and see how it ties into your broader reading.</li>
+                </ul>
+
+                <h3 className="welcome-features-heading">Themes</h3>
+                <p>
+                  Themes let you connect ideas across books. Create themes (e.g. justice, freedom, virtue), attach them to arguments and quotations in your book workspaces, then open any theme to see all linked books, quotations, and arguments in one place. Great for papers and revision.
+                </p>
+
+                <h3 className="welcome-features-heading">Essays</h3>
+                <p>
+                  Manage essay projects in one place. Add essays with title, prompt, course, and due date. Each essay gets its own workspace with Prompt Analysis, Thesis Builder, Outline, and full writing area. Export drafts to PDF when you’re ready.
+                </p>
+
+                <p className="welcome-features-close">
+                  All of your books, themes, and essays stay in your account—private, organized, and ready whenever you sit down to read or write.
+                </p>
               </div>
-              <button
-                type="button"
-                className="btn-text-link"
-                onClick={() => { setMode(m => m === 'login' ? 'register' : 'login'); setError(''); setPassword('') }}
-              >
-                {mode === 'login' ? 'Create an account' : 'Already have an account? Sign in'}
-              </button>
-            </form>
+            </section>
+            <div className="welcome-signin-trigger">
+              <Link to="/signin" className="btn btn-secondary btn-sm welcome-signin-btn">
+                Sign in
+              </Link>
+            </div>
           </>
         )}
       </div>

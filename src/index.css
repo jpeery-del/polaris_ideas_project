@@ -1566,6 +1566,156 @@ button {
   flex-shrink: 0;
 }
 
+/* Questions & Objections tab: critical thinking (no AI) */
+.qo-tab {
+  margin-top: 0.5rem;
+}
+.qo-tab-intro {
+  margin: 0 0 1.5rem;
+  font-size: 0.95rem;
+  color: var(--accent-light);
+  line-height: 1.55;
+  max-width: 52em;
+}
+.qo-section {
+  margin-bottom: 2.5rem;
+}
+.qo-section:last-child {
+  margin-bottom: 0;
+}
+.qo-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.qo-section-title {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+.qo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.qo-empty {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--accent-light);
+  font-style: italic;
+  background: rgba(107, 83, 68, 0.06);
+  border-radius: 8px;
+  border: 1px dashed var(--border);
+}
+.qo-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px var(--shadow);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.qo-card-question {
+  border-left: 3px solid var(--gold);
+}
+.qo-card-objection {
+  border-left: 3px solid rgba(181, 74, 74, 0.5);
+}
+.qo-card.qo-card-drop-target {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(107, 83, 68, 0.2);
+}
+.qo-card.qo-card-dragging {
+  opacity: 0.6;
+}
+.qo-card-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  min-height: 2.75rem;
+}
+.qo-drag-handle {
+  cursor: grab;
+  color: var(--accent-light);
+  font-size: 0.9rem;
+  padding: 0.25rem 0.35rem;
+  user-select: none;
+  flex-shrink: 0;
+}
+.qo-drag-handle:active {
+  cursor: grabbing;
+}
+.qo-card-toggle {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+  background: none;
+  border: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  min-width: 0;
+}
+.qo-chevron {
+  font-size: 0.7rem;
+  color: var(--accent-light);
+  flex-shrink: 0;
+}
+.qo-card-title-display {
+  flex: 1;
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+.qo-card-delete {
+  flex-shrink: 0;
+}
+.qo-card-body {
+  padding: 0 1rem 1rem 1rem;
+  padding-left: calc(1rem + 1.5em);
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+}
+.qo-card-body .qo-label {
+  margin-top: 0.85rem;
+  margin-bottom: 0.35rem;
+  font-family: var(--serif);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+.qo-card-body .qo-label:first-child {
+  margin-top: 0;
+}
+.qo-field {
+  margin-bottom: 0.5rem;
+}
+.qo-question,
+.qo-objection {
+  min-height: 56px;
+  font-family: var(--sans);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  resize: vertical;
+}
+.qo-select {
+  margin-bottom: 0.5rem;
+  max-width: 100%;
+}
+.qo-strength {
+  max-width: 10em;
+}
+
 /* Legacy book list (kept for any remaining references) */
 .books-header {
   margin-bottom: 2rem;

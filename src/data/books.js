@@ -115,12 +115,37 @@ function loadBooks() {
             order: s.order ?? i,
           }))
         : []
+      // Questions & Objections tab: questions and objections
+      const questions = Array.isArray(book.questions)
+        ? book.questions.map((q, i) => ({
+            id: q.id || crypto.randomUUID(),
+            question: q.question ?? '',
+            whyMatters: q.whyMatters ?? '',
+            possibleAnswer: q.possibleAnswer ?? '',
+            remainingUncertainty: q.remainingUncertainty ?? '',
+            order: q.order ?? i,
+            collapsed: !!q.collapsed,
+          }))
+        : []
+      const objections = Array.isArray(book.objections)
+        ? book.objections.map((o, i) => ({
+            id: o.id || crypto.randomUUID(),
+            objection: o.objection ?? '',
+            targetArgumentId: o.targetArgumentId ?? '',
+            strength: ['low', 'medium', 'high'].includes(o.strength) ? o.strength : 'medium',
+            possibleResponse: o.possibleResponse ?? '',
+            order: o.order ?? i,
+            collapsed: !!o.collapsed,
+          }))
+        : []
       return {
         ...book,
         summaryChapters,
         keyArguments,
         quotations,
         philosophicalAnalysisSections,
+        questions,
+        objections,
         author: book.author ?? '',
         translator: book.translator ?? '',
         publisher: book.publisher ?? '',
@@ -199,6 +224,8 @@ export function createBook(opts) {
     keyArguments: [],
     quotations: [],
     philosophicalAnalysisSections: [],
+    questions: [],
+    objections: [],
     createdAt: new Date().toISOString(),
   }
   saveBook(book)
@@ -644,5 +671,113 @@ export function deletePhilosophicalAnalysisSection(bookId, sectionId) {
   const sections = book.philosophicalAnalysisSections.filter(s => s.id !== sectionId)
   sections.forEach((s, i) => { s.order = i })
   saveBook({ ...book, philosophicalAnalysisSections: sections })
+  return getBookById(bookId)
+}
+
+// ——— Questions & Objections tab ———
+
+export function getQuestions(book) {
+  const raw = book?.questions
+  if (!Array.isArray(raw)) return []
+  return [...raw].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+}
+
+export function addQuestion(bookId) {
+  const book = getBookById(bookId)
+  if (!book) return null
+  const list = getQuestions(book)
+  const entry = {
+    id: crypto.randomUUID(),
+    question: '',
+    whyMatters: '',
+    possibleAnswer: '',
+    remainingUncertainty: '',
+    order: list.length,
+    collapsed: false,
+  }
+  saveBook({ ...book, questions: [...list, entry] })
+  return entry
+}
+
+export function updateQuestion(bookId, questionId, updates) {
+  const book = getBookById(bookId)
+  if (!book || !Array.isArray(book.questions)) return null
+  const questions = book.questions.map(q =>
+    q.id === questionId ? { ...q, ...updates } : q
+  )
+  saveBook({ ...book, questions })
+  return getBookById(bookId)
+}
+
+export function deleteQuestion(bookId, questionId) {
+  const book = getBookById(bookId)
+  if (!book || !Array.isArray(book.questions)) return null
+  const list = book.questions.filter(q => q.id !== questionId)
+  list.forEach((q, i) => { q.order = i })
+  saveBook({ ...book, questions: list })
+  return getBookById(bookId)
+}
+
+export function reorderQuestions(bookId, fromIndex, toIndex) {
+  const book = getBookById(bookId)
+  const list = getQuestions(book)
+  if (fromIndex < 0 || toIndex < 0 || fromIndex >= list.length || toIndex >= list.length) return getBookById(bookId)
+  const [removed] = list.splice(fromIndex, 1)
+  list.splice(toIndex, 0, removed)
+  list.forEach((q, i) => { q.order = i })
+  saveBook({ ...book, questions: list })
+  return getBookById(bookId)
+}
+
+export function getObjections(book) {
+  const raw = book?.objections
+  if (!Array.isArray(raw)) return []
+  return [...raw].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+}
+
+export function addObjection(bookId) {
+  const book = getBookById(bookId)
+  if (!book) return null
+  const list = getObjections(book)
+  const entry = {
+    id: crypto.randomUUID(),
+    objection: '',
+    targetArgumentId: '',
+    strength: 'medium',
+    possibleResponse: '',
+    order: list.length,
+    collapsed: false,
+  }
+  saveBook({ ...book, objections: [...list, entry] })
+  return entry
+}
+
+export function updateObjection(bookId, objectionId, updates) {
+  const book = getBookById(bookId)
+  if (!book || !Array.isArray(book.objections)) return null
+  const objections = book.objections.map(o =>
+    o.id === objectionId ? { ...o, ...updates } : o
+  )
+  saveBook({ ...book, objections })
+  return getBookById(bookId)
+}
+
+export function deleteObjection(bookId, objectionId) {
+  const book = getBookById(bookId)
+  if (!book || !Array.isArray(book.objections)) return null
+  const list = book.objections.filter(o => o.id !== objectionId)
+  list.forEach((o, i) => { o.order = i })
+  saveBook({ ...book, objections: list })
+  return getBookById(bookId)
+}
+
+export function reorderObjections(bookId, fromIndex, toIndex) {
+  const book = getBookById(bookId)
+  const list = getObjections(book)
+  if (fromIndex < 0 || toIndex < 0 || fromIndex >= list.length || toIndex >= list.length) return getBookById(bookId)
+  const [removed] = list.splice(fromIndex, 1)
+  list.splice(toIndex, 0, removed)
+  list.forEach((o, i) => { o.order = i })
+  saveBook({ ...book, objections: list })
   return getBookById(bookId)
 }

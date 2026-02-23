@@ -10,7 +10,6 @@ export const ESSAY_TAB_KEYS = [
   'outline',
   'evidence',
   'objections',
-  'export',
 ]
 
 export const ESSAY_TAB_LABELS = {
@@ -19,7 +18,6 @@ export const ESSAY_TAB_LABELS = {
   outline: 'Outline',
   evidence: 'Evidence',
   objections: 'Objections',
-  export: 'Export',
 }
 
 function defaultTabContent() {

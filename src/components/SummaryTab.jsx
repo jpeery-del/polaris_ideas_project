@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState } from 'react'
 import {
   getSummaryChapters,
   addSummaryChapter,
@@ -6,73 +6,7 @@ import {
   deleteSummaryChapter,
   reorderSummaryChapters,
 } from '../data/books'
-
-const AUTO_SAVE_MS = 500
-
-function RichSummaryEditor({ html, onSave, placeholder }) {
-  const ref = useRef(null)
-  const [saving, setSaving] = useState(false)
-  const timeoutRef = useRef(null)
-
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    if (el.innerHTML !== html) {
-      el.innerHTML = html || ''
-    }
-  }, [html])
-
-  const scheduleSave = useCallback(() => {
-    setSaving(true)
-    if (timeoutRef.current) clearTimeout(timeoutRef.current)
-    timeoutRef.current = setTimeout(() => {
-      const value = ref.current?.innerHTML ?? ''
-      onSave(value)
-      setSaving(false)
-      timeoutRef.current = null
-    }, AUTO_SAVE_MS)
-  }, [onSave])
-
-  const exec = (cmd, value = null) => {
-    document.execCommand(cmd, false, value)
-    ref.current?.focus()
-    scheduleSave()
-  }
-
-  return (
-    <div className="summary-rich-editor">
-      <div className="summary-rich-toolbar">
-        <button type="button" className="btn btn-sm summary-toolbar-btn" onClick={() => exec('bold')} title="Bold">
-          <b>B</b>
-        </button>
-        <button type="button" className="btn btn-sm summary-toolbar-btn" onClick={() => exec('italic')} title="Italic">
-          <i>I</i>
-        </button>
-        <button type="button" className="btn btn-sm summary-toolbar-btn" onClick={() => exec('insertUnorderedList')} title="Bullet list">
-          • List
-        </button>
-        {saving && <span className="summary-autosave-hint">Saving…</span>}
-      </div>
-      <div
-        ref={ref}
-        className="summary-rich-content"
-        contentEditable
-        data-placeholder={placeholder}
-        onInput={scheduleSave}
-        onBlur={() => {
-          if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current)
-            timeoutRef.current = null
-          }
-          const value = ref.current?.innerHTML ?? ''
-          onSave(value)
-          setSaving(false)
-        }}
-        suppressContentEditableWarning
-      />
-    </div>
-  )
-}
+import RichTextEditor from './RichTextEditor'
 
 function ChapterBlock({
   chapter,
@@ -99,10 +33,6 @@ function ChapterBlock({
   const handlePageRangeBlur = (e) => {
     const v = e.target.value.trim()
     if (v !== (chapter.pageRange ?? '')) onUpdate(bookId, chapter.id, { pageRange: v })
-  }
-  const handleThesisBlur = (e) => {
-    const v = e.target.value.trim()
-    if (v !== (chapter.mainThesis ?? '')) onUpdate(bookId, chapter.id, { mainThesis: v })
   }
   const handleSummarySave = (html) => {
     if (html !== (chapter.summaryHtml ?? '')) onUpdate(bookId, chapter.id, { summaryHtml: html })
@@ -166,17 +96,17 @@ function ChapterBlock({
             placeholder="e.g. 1–24"
           />
           <label className="form-label">Main thesis of chapter</label>
-          <textarea
-            className="form-input form-textarea summary-thesis"
-            defaultValue={chapter.mainThesis ?? ''}
-            onBlur={handleThesisBlur}
-            placeholder="One or two sentences on the chapter’s main thesis."
-            rows={2}
+          <RichTextEditor
+            value={chapter.mainThesis ?? ''}
+            onChange={(html) => onUpdate(bookId, chapter.id, { mainThesis: html })}
+            placeholder="One or two sentences on the chapter's main thesis."
+            minRows={2}
+            showSaveHint={false}
           />
           <label className="form-label">Structured summary</label>
-          <RichSummaryEditor
-            html={chapter.summaryHtml ?? ''}
-            onSave={handleSummarySave}
+          <RichTextEditor
+            value={chapter.summaryHtml ?? ''}
+            onChange={handleSummarySave}
             placeholder="Write your summary (bold, italics, bullets supported)."
           />
         </div>

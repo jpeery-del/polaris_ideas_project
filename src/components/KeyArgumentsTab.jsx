@@ -8,6 +8,7 @@ import {
   getAllThemes,
 } from '../data/books'
 import ThemeIdsPicker from './ThemeIdsPicker'
+import RichTextEditor from './RichTextEditor'
 
 function PremisesList({ premises, onChange }) {
   const addPremise = () => onChange([...(premises || []), ''])
@@ -134,12 +135,12 @@ function ArgumentCard({
           />
 
           <label className="form-label key-args-label">Claim</label>
-          <textarea
-            className="form-input form-textarea key-args-field key-args-claim"
+          <RichTextEditor
             value={argument.claim ?? ''}
-            onChange={(e) => onUpdate(bookId, argument.id, { claim: e.target.value })}
+            onChange={(html) => onUpdate(bookId, argument.id, { claim: html })}
             placeholder="Main thesis of this argument"
-            rows={2}
+            minRows={2}
+            showSaveHint={false}
           />
 
           <label className="form-label key-args-label">Premises</label>
@@ -149,39 +150,39 @@ function ArgumentCard({
           />
 
           <label className="form-label key-args-label">Conclusion</label>
-          <textarea
-            className="form-input form-textarea key-args-field key-args-conclusion"
+          <RichTextEditor
             value={argument.conclusion ?? ''}
-            onChange={(e) => onUpdate(bookId, argument.id, { conclusion: e.target.value })}
+            onChange={(html) => onUpdate(bookId, argument.id, { conclusion: html })}
             placeholder="What the argument concludes"
-            rows={2}
+            minRows={2}
+            showSaveHint={false}
           />
 
           <label className="form-label key-args-label">Assumptions</label>
-          <textarea
-            className="form-input form-textarea key-args-field key-args-assumptions"
+          <RichTextEditor
             value={argument.assumptions ?? ''}
-            onChange={(e) => onUpdate(bookId, argument.id, { assumptions: e.target.value })}
+            onChange={(html) => onUpdate(bookId, argument.id, { assumptions: html })}
             placeholder="Unstated or background assumptions"
-            rows={2}
+            minRows={2}
+            showSaveHint={false}
           />
 
           <label className="form-label key-args-label">Strengths</label>
-          <textarea
-            className="form-input form-textarea key-args-field key-args-strengths"
+          <RichTextEditor
             value={argument.strengths ?? ''}
-            onChange={(e) => onUpdate(bookId, argument.id, { strengths: e.target.value })}
+            onChange={(html) => onUpdate(bookId, argument.id, { strengths: html })}
             placeholder="Notable strengths of the argument"
-            rows={2}
+            minRows={2}
+            showSaveHint={false}
           />
 
           <label className="form-label key-args-label">Weaknesses</label>
-          <textarea
-            className="form-input form-textarea key-args-field key-args-weaknesses"
+          <RichTextEditor
             value={argument.weaknesses ?? ''}
-            onChange={(e) => onUpdate(bookId, argument.id, { weaknesses: e.target.value })}
+            onChange={(html) => onUpdate(bookId, argument.id, { weaknesses: html })}
             placeholder="Notable weaknesses or objections"
-            rows={2}
+            minRows={2}
+            showSaveHint={false}
           />
 
           <label className="form-label key-args-label">Shared themes</label>

@@ -13,6 +13,7 @@ import {
   NOTE_TYPES,
   BOOK_OVERVIEW_NOTE_TYPES,
 } from '../data/books'
+import RichTextEditor from './RichTextEditor'
 
 export function SectionBlock({
   bookId,
@@ -153,12 +154,12 @@ export function SectionBlock({
                   ))}
                   {newEntry ? (
                     <form onSubmit={e => handleAddEntry(e, typeId)} className="entry-add-form">
-                      <textarea
-                        className="form-input note-edit-textarea"
-                        placeholder={`Add ${label.toLowerCase()}…`}
+                      <RichTextEditor
                         value={newEntry.content || ''}
-                        onChange={e => setNewEntryByKey(prev => ({ ...prev, [key]: { type: typeId, content: e.target.value } }))}
-                        rows={2}
+                        onChange={(html) => setNewEntryByKey(prev => ({ ...prev, [key]: { type: typeId, content: html } }))}
+                        placeholder={`Add ${label.toLowerCase()}…`}
+                        minRows={2}
+                        showSaveHint={false}
                       />
                       <div className="note-edit-actions">
                         <button type="button" className="btn-icon" onClick={() => cancelAddEntry(typeId)}>Cancel</button>
@@ -194,12 +195,12 @@ export function SectionBlock({
           ))}
           {newEntryByKey?.[keyNote] !== undefined ? (
             <form onSubmit={handleAddFlatEntry} className="entry-add-form">
-              <textarea
-                className="form-input note-edit-textarea"
-                placeholder="Add note…"
+              <RichTextEditor
                 value={newEntryByKey[keyNote]?.content || ''}
-                onChange={e => setNewEntryByKey(prev => ({ ...prev, [keyNote]: { type: 'note', content: e.target.value } }))}
-                rows={2}
+                onChange={(html) => setNewEntryByKey(prev => ({ ...prev, [keyNote]: { type: 'note', content: html } }))}
+                placeholder="Add note…"
+                minRows={2}
+                showSaveHint={false}
               />
               <div className="note-edit-actions">
                 <button type="button" className="btn-icon" onClick={cancelAddFlatEntry}>Cancel</button>
@@ -237,11 +238,11 @@ export function EntryItem({
       <div className="entry-item-main">
         {editingNote?.noteId === note.id ? (
           <div className="note-edit-inline">
-            <textarea
-              className="form-input note-edit-textarea"
+            <RichTextEditor
               value={editingNote.content}
-              onChange={e => setEditingNote(prev => prev ? { ...prev, content: e.target.value } : null)}
-              rows={2}
+              onChange={(html) => setEditingNote(prev => prev ? { ...prev, content: html } : null)}
+              minRows={2}
+              showSaveHint={false}
             />
             <div className="note-edit-actions">
               <button type="button" className="btn-icon" onClick={() => setEditingNote(null)}>Cancel</button>
@@ -259,9 +260,9 @@ export function EntryItem({
             </div>
           </div>
         ) : (
-          <>
+            <>
             <span className="entry-type-badge">{typeLabel}</span>
-            <p className="note-content">{note.content}</p>
+            <p className="note-content" dangerouslySetInnerHTML={{ __html: note.content || '' }} />
             <div className="note-item-actions">
               <button type="button" className="btn-icon" onClick={() => setEditingNote({ sectionId, noteId: note.id, content: note.content })}>Edit</button>
               <button
@@ -280,11 +281,11 @@ export function EntryItem({
           <div key={sub.id} className="subentry-item">
             {editingSubentry?.noteId === note.id && editingSubentry?.subentryId === sub.id ? (
               <div className="note-edit-inline subentry-edit">
-                <textarea
-                  className="form-input note-edit-textarea"
+                <RichTextEditor
                   value={editingSubentry.content}
-                  onChange={e => setEditingSubentry(prev => prev ? { ...prev, content: e.target.value } : null)}
-                  rows={1}
+                  onChange={(html) => setEditingSubentry(prev => prev ? { ...prev, content: html } : null)}
+                  minRows={1}
+                  showSaveHint={false}
                 />
                 <div className="note-edit-actions">
                   <button type="button" className="btn-icon" onClick={() => setEditingSubentry(null)}>Cancel</button>
@@ -303,7 +304,7 @@ export function EntryItem({
               </div>
             ) : (
               <>
-                <p className="subentry-content">{sub.content}</p>
+                <p className="subentry-content" dangerouslySetInnerHTML={{ __html: sub.content || '' }} />
                 <div className="note-item-actions">
                   <button type="button" className="btn-icon" onClick={() => setEditingSubentry({ noteId: note.id, subentryId: sub.id, sectionId, content: sub.content })}>Edit</button>
                   <button

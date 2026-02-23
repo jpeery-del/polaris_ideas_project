@@ -13,6 +13,7 @@ import QuotationsTab from '../components/QuotationsTab'
 import PhilosophicalAnalysisTab from '../components/PhilosophicalAnalysisTab'
 import QuestionsObjectionsTab from '../components/QuestionsObjectionsTab'
 import CrossConnectionsTab from '../components/CrossConnectionsTab'
+import RichTextEditor from '../components/RichTextEditor'
 
 export default function BookPage() {
   const { id } = useParams()
@@ -41,16 +42,16 @@ export default function BookPage() {
     )
   }
 
-  const handleTabBlur = () => {
+  const handleTabBlur = (contentFromBlur) => {
     const structuredTabs = ['summary', 'keyArguments', 'quotations', 'philosophicalAnalysis', 'questionsObjections', 'crossConnections']
     if (structuredTabs.includes(activeTab)) return
-    const content = (currentBook.tabContent || {})[activeTab]
-    if (content === tabValue) return
+    const content = contentFromBlur !== undefined ? contentFromBlur : tabValue
+    if (content === (currentBook.tabContent || {})[activeTab]) return
     saveBook({
       ...currentBook,
       tabContent: {
         ...(currentBook.tabContent || {}),
-        [activeTab]: tabValue,
+        [activeTab]: content,
       },
     })
     refresh()
@@ -130,13 +131,11 @@ export default function BookPage() {
         ) : activeTab === 'crossConnections' ? (
           <CrossConnectionsTab book={currentBook} onRefresh={refresh} />
         ) : (
-          <textarea
-            className="form-input book-workspace-textarea"
+          <RichTextEditor
             value={tabValue}
-            onChange={(e) => setTabValue(e.target.value)}
+            onChange={setTabValue}
             onBlur={handleTabBlur}
             placeholder={`Add notes for ${BOOK_TAB_LABELS[activeTab]}…`}
-            rows={18}
           />
         )}
       </div>

@@ -9,6 +9,8 @@ import {
   getAllThemes,
 } from '../data/books'
 import ThemeIdsPicker from './ThemeIdsPicker'
+import RichTextEditor from './RichTextEditor'
+import { stripHtml } from '../utils/text'
 
 function TagsInput({ tags, onChange, placeholder }) {
   const [input, setInput] = useState('')
@@ -95,8 +97,9 @@ function QuotationCard({
       navigator.clipboard.writeText(citationText)
     }
   }
-  const preview = (quotation.quoteText ?? '').trim().slice(0, 60)
-  const titleDisplay = preview ? (preview.length < (quotation.quoteText ?? '').trim().length ? `${preview}…` : preview) : 'Untitled quotation'
+  const rawQuote = quotation.quoteText ?? ''
+  const preview = stripHtml(rawQuote).trim().slice(0, 60)
+  const titleDisplay = preview ? (preview.length < stripHtml(rawQuote).trim().length ? preview + '…' : preview) : 'Untitled quotation'
 
   return (
     <div
@@ -149,12 +152,12 @@ function QuotationCard({
       {!collapsed && (
         <div className="quotations-card-body">
           <label className="form-label quotations-label">Quote</label>
-          <textarea
-            className="form-input form-textarea quotations-quote"
+          <RichTextEditor
             value={quotation.quoteText ?? ''}
-            onChange={(e) => onUpdate(bookId, quotation.id, { quoteText: e.target.value })}
+            onChange={(html) => onUpdate(bookId, quotation.id, { quoteText: html })}
             placeholder="Paste or type the quoted text…"
-            rows={4}
+            minRows={4}
+            showSaveHint={false}
           />
           <label className="form-label quotations-label">Page number</label>
           <input
@@ -165,20 +168,20 @@ function QuotationCard({
             placeholder="e.g. 42"
           />
           <label className="form-label quotations-label">Context</label>
-          <textarea
-            className="form-input form-textarea quotations-context"
+          <RichTextEditor
             value={quotation.context ?? ''}
-            onChange={(e) => onUpdate(bookId, quotation.id, { context: e.target.value })}
+            onChange={(html) => onUpdate(bookId, quotation.id, { context: html })}
             placeholder="What is happening in the text at this point?"
-            rows={2}
+            minRows={2}
+            showSaveHint={false}
           />
           <label className="form-label quotations-label">Why it matters</label>
-          <textarea
-            className="form-input form-textarea quotations-why"
+          <RichTextEditor
             value={quotation.whyItMatters ?? ''}
-            onChange={(e) => onUpdate(bookId, quotation.id, { whyItMatters: e.target.value })}
+            onChange={(html) => onUpdate(bookId, quotation.id, { whyItMatters: html })}
             placeholder="Your analysis of why this quotation matters"
-            rows={3}
+            minRows={3}
+            showSaveHint={false}
           />
           <label className="form-label quotations-label">Tags (free-form)</label>
           <TagsInput

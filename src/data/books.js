@@ -1,3 +1,5 @@
+import { stripHtml } from '../utils/text.js'
+
 const STORAGE_KEY_BOOKS = 'platonic-study-books'
 const STORAGE_KEY_THEMES = 'platonic-study-themes'
 
@@ -627,7 +629,7 @@ export function setQuotationsOrder(bookId, quotationIdsInOrder) {
  * @returns {string}
  */
 export function formatQuotationCitation(quotation, book, style = 'plain') {
-  const quote = (quotation?.quoteText ?? '').trim()
+  const quote = stripHtml((quotation?.quoteText ?? '').trim())
   const page = (quotation?.pageNumber ?? '').trim()
   const title = (book?.title ?? '').trim()
   const author = (book?.author ?? '').trim()

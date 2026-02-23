@@ -8,6 +8,7 @@ import {
   ESSAY_TAB_LABELS,
   ESSAY_STATUSES,
 } from '../data/essays'
+import RichTextEditor from '../components/RichTextEditor'
 
 const DEFAULT_THESIS_BUILDER = {
   myAnswer: '',
@@ -112,14 +113,14 @@ export default function EssayPage() {
     )
   }
 
-  const handleTabBlur = () => {
-    const content = (current.tabContent || {})[activeTab]
-    if (content === tabValue) return
+  const handleTabBlur = (contentFromBlur) => {
+    const content = contentFromBlur !== undefined ? contentFromBlur : tabValue
+    if (content === (current.tabContent || {})[activeTab]) return
     saveEssay({
       ...current,
       tabContent: {
         ...(current.tabContent || {}),
-        [activeTab]: tabValue,
+        [activeTab]: content,
       },
     })
     refresh()
@@ -319,20 +320,17 @@ export default function EssayPage() {
             {current.prompt && (
               <div className="essay-prompt-block">
                 <h3 className="essay-prompt-heading">Assignment prompt</h3>
-                <div className="essay-prompt-text">{current.prompt}</div>
+                <div className="essay-prompt-text" dangerouslySetInnerHTML={{ __html: current.prompt }} />
               </div>
             )}
             <label className="form-label" htmlFor="prompt-analysis-notes">
               Your analysis and notes
             </label>
-            <textarea
-              id="prompt-analysis-notes"
-              className="form-input essay-workspace-textarea"
+            <RichTextEditor
               value={tabValue}
-              onChange={(e) => setTabValue(e.target.value)}
+              onChange={(html) => setTabValue(html)}
               onBlur={handleTabBlur}
               placeholder="Break down the prompt, key terms, and requirements…"
-              rows={14}
             />
           </div>
         ) : activeTab === 'thesisBuilder' ? (
@@ -341,65 +339,60 @@ export default function EssayPage() {
               <label className="form-label" htmlFor="thesis-my-answer">
                 My Answer (main claim)
               </label>
-              <textarea
-                id="thesis-my-answer"
-                className="form-input essay-workspace-textarea essay-thesis-textarea"
+              <RichTextEditor
                 value={thesisData.myAnswer}
-                onChange={(e) => handleThesisField('myAnswer', e.target.value)}
+                onChange={(html) => handleThesisField('myAnswer', html)}
                 placeholder="Your main claim in a sentence or two…"
-                rows={3}
+                minRows={3}
+                showSaveHint={false}
               />
             </div>
             <div className="essay-thesis-field">
               <label className="form-label" htmlFor="thesis-why-matters">
                 Why It Matters
               </label>
-              <textarea
-                id="thesis-why-matters"
-                className="form-input essay-workspace-textarea essay-thesis-textarea"
+              <RichTextEditor
                 value={thesisData.whyItMatters}
-                onChange={(e) => handleThesisField('whyItMatters', e.target.value)}
+                onChange={(html) => handleThesisField('whyItMatters', html)}
                 placeholder="Why this question or claim matters…"
-                rows={3}
+                minRows={3}
+                showSaveHint={false}
               />
             </div>
             <div className="essay-thesis-field">
               <label className="form-label" htmlFor="thesis-who-disagrees">
                 Who Disagrees
               </label>
-              <textarea
-                id="thesis-who-disagrees"
-                className="form-input essay-workspace-textarea essay-thesis-textarea"
+              <RichTextEditor
                 value={thesisData.whoDisagrees}
-                onChange={(e) => handleThesisField('whoDisagrees', e.target.value)}
+                onChange={(html) => handleThesisField('whoDisagrees', html)}
                 placeholder="Who might disagree, and what do they believe?"
-                rows={3}
+                minRows={3}
+                showSaveHint={false}
               />
             </div>
             <div className="essay-thesis-field">
               <label className="form-label" htmlFor="thesis-stakes-right">
                 Stakes If I'm Right
               </label>
-              <textarea
-                id="thesis-stakes-right"
-                className="form-input essay-workspace-textarea essay-thesis-textarea"
+              <RichTextEditor
                 value={thesisData.stakesIfRight}
-                onChange={(e) => handleThesisField('stakesIfRight', e.target.value)}
+                onChange={(html) => handleThesisField('stakesIfRight', html)}
                 placeholder="What follows if your claim is correct?"
-                rows={2}
+                minRows={2}
+                showSaveHint={false}
               />
             </div>
             <div className="essay-thesis-field">
               <label className="form-label" htmlFor="thesis-stakes-wrong">
                 Stakes If I'm Wrong
               </label>
-              <textarea
-                id="thesis-stakes-wrong"
-                className="form-input essay-workspace-textarea essay-thesis-textarea"
+              <RichTextEditor
                 value={thesisData.stakesIfWrong}
-                onChange={(e) => handleThesisField('stakesIfWrong', e.target.value)}
+                onChange={(html) => handleThesisField('stakesIfWrong', html)}
                 placeholder="What follows if your claim is incorrect?"
-                rows={2}
+                minRows={2}
+                showSaveHint={false}
               />
             </div>
             <div className="essay-thesis-field">
@@ -454,35 +447,32 @@ export default function EssayPage() {
               <h3 className="essay-outline-section-heading">Introduction</h3>
               <div className="essay-outline-field">
                 <label className="form-label" htmlFor="outline-intro-hook">Hook</label>
-                <textarea
-                  id="outline-intro-hook"
-                  className="form-input form-textarea essay-outline-textarea"
+                <RichTextEditor
                   value={outlineData.introduction.hook}
-                  onChange={(e) => handleOutlineIntro('hook', e.target.value)}
+                  onChange={(html) => handleOutlineIntro('hook', html)}
                   placeholder="Opening that draws the reader in…"
-                  rows={2}
+                  minRows={2}
+                  showSaveHint={false}
                 />
               </div>
               <div className="essay-outline-field">
                 <label className="form-label" htmlFor="outline-intro-context">Context</label>
-                <textarea
-                  id="outline-intro-context"
-                  className="form-input form-textarea essay-outline-textarea"
+                <RichTextEditor
                   value={outlineData.introduction.context}
-                  onChange={(e) => handleOutlineIntro('context', e.target.value)}
+                  onChange={(html) => handleOutlineIntro('context', html)}
                   placeholder="Background the reader needs…"
-                  rows={2}
+                  minRows={2}
+                  showSaveHint={false}
                 />
               </div>
               <div className="essay-outline-field">
                 <label className="form-label" htmlFor="outline-intro-thesis">Thesis</label>
-                <textarea
-                  id="outline-intro-thesis"
-                  className="form-input form-textarea essay-outline-textarea"
+                <RichTextEditor
                   value={outlineData.introduction.thesis}
-                  onChange={(e) => handleOutlineIntro('thesis', e.target.value)}
+                  onChange={(html) => handleOutlineIntro('thesis', html)}
                   placeholder="Your main claim (one sentence)."
-                  rows={2}
+                  minRows={2}
+                  showSaveHint={false}
                 />
               </div>
             </section>
@@ -520,12 +510,12 @@ export default function EssayPage() {
                         <div className="essay-outline-body-fields">
                           <div className="essay-outline-field">
                             <label className="form-label">Paragraph claim</label>
-                            <textarea
-                              className="form-input form-textarea essay-outline-textarea"
+                            <RichTextEditor
                               value={block.paragraphClaim}
-                              onChange={(e) => handleOutlineBodyUpdate(index, { paragraphClaim: e.target.value })}
+                              onChange={(html) => handleOutlineBodyUpdate(index, { paragraphClaim: html })}
                               placeholder="Main claim for this paragraph."
-                              rows={2}
+                              minRows={2}
+                              showSaveHint={false}
                             />
                           </div>
                           <div className="essay-outline-field">
@@ -540,32 +530,32 @@ export default function EssayPage() {
                           </div>
                           <div className="essay-outline-field">
                             <label className="form-label">Analysis</label>
-                            <textarea
-                              className="form-input form-textarea essay-outline-textarea"
+                            <RichTextEditor
                               value={block.analysis}
-                              onChange={(e) => handleOutlineBodyUpdate(index, { analysis: e.target.value })}
+                              onChange={(html) => handleOutlineBodyUpdate(index, { analysis: html })}
                               placeholder="How the evidence supports the claim."
-                              rows={2}
+                              minRows={2}
+                              showSaveHint={false}
                             />
                           </div>
                           <div className="essay-outline-field">
                             <label className="form-label">Counterargument</label>
-                            <textarea
-                              className="form-input form-textarea essay-outline-textarea"
+                            <RichTextEditor
                               value={block.counterargument}
-                              onChange={(e) => handleOutlineBodyUpdate(index, { counterargument: e.target.value })}
+                              onChange={(html) => handleOutlineBodyUpdate(index, { counterargument: html })}
                               placeholder="Objection or opposing view."
-                              rows={2}
+                              minRows={2}
+                              showSaveHint={false}
                             />
                           </div>
                           <div className="essay-outline-field">
                             <label className="form-label">Response</label>
-                            <textarea
-                              className="form-input form-textarea essay-outline-textarea"
+                            <RichTextEditor
                               value={block.response}
-                              onChange={(e) => handleOutlineBodyUpdate(index, { response: e.target.value })}
+                              onChange={(html) => handleOutlineBodyUpdate(index, { response: html })}
                               placeholder="Your reply to the counterargument."
-                              rows={2}
+                              minRows={2}
+                              showSaveHint={false}
                             />
                           </div>
                         </div>
@@ -588,12 +578,12 @@ export default function EssayPage() {
               <h3 className="essay-outline-section-heading">Objection section</h3>
               <p className="essay-outline-section-desc">Address major objections before the conclusion.</p>
               <div className="essay-outline-field">
-                <textarea
-                  className="form-input form-textarea essay-outline-textarea"
+                <RichTextEditor
                   value={outlineData.objectionSection}
-                  onChange={(e) => handleOutlineObjectionSection(e.target.value)}
+                  onChange={handleOutlineObjectionSection}
                   placeholder="Outline how you will handle objections…"
-                  rows={4}
+                  minRows={4}
+                  showSaveHint={false}
                 />
               </div>
             </section>
@@ -602,48 +592,43 @@ export default function EssayPage() {
               <h3 className="essay-outline-section-heading">Conclusion</h3>
               <div className="essay-outline-field">
                 <label className="form-label" htmlFor="outline-concl-restate">Restate thesis</label>
-                <textarea
-                  id="outline-concl-restate"
-                  className="form-input form-textarea essay-outline-textarea"
+                <RichTextEditor
                   value={outlineData.conclusion.restateThesis}
-                  onChange={(e) => handleOutlineConclusion('restateThesis', e.target.value)}
+                  onChange={(html) => handleOutlineConclusion('restateThesis', html)}
                   placeholder="Rephrase your main claim."
-                  rows={2}
+                  minRows={2}
+                  showSaveHint={false}
                 />
               </div>
               <div className="essay-outline-field">
                 <label className="form-label" htmlFor="outline-concl-broader">Broader implication</label>
-                <textarea
-                  id="outline-concl-broader"
-                  className="form-input form-textarea essay-outline-textarea"
+                <RichTextEditor
                   value={outlineData.conclusion.broaderImplication}
-                  onChange={(e) => handleOutlineConclusion('broaderImplication', e.target.value)}
+                  onChange={(html) => handleOutlineConclusion('broaderImplication', html)}
                   placeholder="What this implies more generally."
-                  rows={2}
+                  minRows={2}
+                  showSaveHint={false}
                 />
               </div>
               <div className="essay-outline-field">
                 <label className="form-label" htmlFor="outline-concl-matters">Why it matters</label>
-                <textarea
-                  id="outline-concl-matters"
-                  className="form-input form-textarea essay-outline-textarea"
+                <RichTextEditor
                   value={outlineData.conclusion.whyItMatters}
-                  onChange={(e) => handleOutlineConclusion('whyItMatters', e.target.value)}
+                  onChange={(html) => handleOutlineConclusion('whyItMatters', html)}
                   placeholder="So what? Why should the reader care?"
-                  rows={2}
+                  minRows={2}
+                  showSaveHint={false}
                 />
               </div>
             </section>
           </div>
         ) : (
-          <textarea
-            className="form-input essay-workspace-textarea"
-            value={tabValue}
-            onChange={(e) => setTabValue(e.target.value)}
-            onBlur={handleTabBlur}
-            placeholder={`Add content for ${ESSAY_TAB_LABELS[activeTab]}…`}
-            rows={18}
-          />
+            <RichTextEditor
+              value={tabValue}
+              onChange={setTabValue}
+              onBlur={handleTabBlur}
+              placeholder={`Add content for ${ESSAY_TAB_LABELS[activeTab]}…`}
+            />
         )}
       </div>
     </div>

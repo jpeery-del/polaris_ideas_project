@@ -10,6 +10,7 @@ import {
   getQuotationsByThemeId,
   getArgumentsByThemeId,
 } from '../data/books'
+import { stripHtml } from '../utils/text'
 
 function ThemeDetail({ themeId, onBack, navigate }) {
   const theme = getThemeById(themeId)
@@ -106,7 +107,7 @@ function ThemeDetail({ themeId, onBack, navigate }) {
           <ul className="themes-list themes-quotations">
             {quotations.map(({ book, quotation }) => (
               <li key={`${book.id}-${quotation.id}`} className="themes-quotation-item">
-                <span className="themes-quotation-text">"{ (quotation.quoteText || '').trim().slice(0, 120) }{ (quotation.quoteText || '').trim().length > 120 ? '…' : '' }"</span>
+                <span className="themes-quotation-text">"{ stripHtml(quotation.quoteText || '').trim().slice(0, 120) }{ stripHtml(quotation.quoteText || '').trim().length > 120 ? '…' : '' }"</span>
                 <span className="themes-quotation-source">
                   — <Link to={`/book/${book.id}`}>{book.title}</Link>
                   {quotation.pageNumber ? `, p. ${quotation.pageNumber}` : ''}
@@ -127,7 +128,7 @@ function ThemeDetail({ themeId, onBack, navigate }) {
               <li key={`${book.id}-${argument.id}`} className="themes-argument-item">
                 <span className="themes-argument-title">{argument.title?.trim() || 'Untitled argument'}</span>
                 {argument.claim && (
-                  <span className="themes-argument-claim"> — {argument.claim.trim().slice(0, 80)}{ argument.claim.trim().length > 80 ? '…' : '' }</span>
+                  <span className="themes-argument-claim"> — { stripHtml(argument.claim).trim().slice(0, 80) }{ stripHtml(argument.claim).trim().length > 80 ? '…' : '' }</span>
                 )}
                 <span className="themes-argument-source">
                   — <Link to={`/book/${book.id}`}>{book.title}</Link>

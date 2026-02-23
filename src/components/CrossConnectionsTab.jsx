@@ -7,6 +7,7 @@ import {
   saveBook,
   addTheme,
 } from '../data/books'
+import { stripHtml } from '../utils/text'
 
 export default function CrossConnectionsTab({ book, onRefresh }) {
   const allBooks = getAllBooks().filter(b => b.id !== book.id)
@@ -167,7 +168,7 @@ export default function CrossConnectionsTab({ book, onRefresh }) {
             <strong>Quotations with themes:</strong>{' '}
             {(book.quotations || [])
               .filter(q => (q.themeIds || []).length > 0)
-              .map(q => (q.quoteText || '').trim().slice(0, 40) + ((q.quoteText || '').trim().length > 40 ? '…' : ''))
+              .map(q => stripHtml(q.quoteText || '').trim().slice(0, 40) + (stripHtml(q.quoteText || '').trim().length > 40 ? '…' : ''))
               .join(' · ') || '—'}
           </div>
         )}
@@ -176,7 +177,7 @@ export default function CrossConnectionsTab({ book, onRefresh }) {
             <strong>Arguments with themes:</strong>{' '}
             {(book.keyArguments || [])
               .filter(a => (a.themeIds || []).length > 0)
-              .map(a => (a.title || a.claim || '').trim().slice(0, 40) || 'Untitled')
+              .map(a => (a.title || stripHtml(a.claim || '')).trim().slice(0, 40) || 'Untitled')
               .join(' · ')}
           </div>
         )}

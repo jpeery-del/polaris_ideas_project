@@ -9,6 +9,7 @@ import {
   getQuotations,
   getSummaryForExport,
 } from '../data/books'
+import { stripHtml } from './text'
 
 export const CITATION_STYLES = [
   { id: 'mla', label: 'MLA' },
@@ -33,13 +34,6 @@ const TITLE_FONT_SIZE = 16
 const HEADING_FONT_SIZE = 12
 const BODY_FONT_SIZE = 10
 const FOOTER_FONT_SIZE = 9
-
-function stripHtml(html) {
-  if (typeof html !== 'string') return ''
-  const div = document.createElement('div')
-  div.innerHTML = html
-  return (div.textContent || div.innerText || '').replace(/\s+/g, ' ').trim()
-}
 
 /**
  * Format a book citation for a quotation (works-cited style).
@@ -90,10 +84,10 @@ export function formatBookCitation(book, style) {
  * Format a single quotation line for export (quote + page + source).
  */
 export function formatQuotationForExport(quotation, book, style) {
-  const quote = (quotation?.quoteText ?? '').trim()
+  const quote = stripHtml((quotation?.quoteText ?? '').trim())
   const page = (quotation?.pageNumber ?? '').trim()
-  const context = (quotation?.context ?? '').trim()
-  const whyItMatters = (quotation?.whyItMatters ?? '').trim()
+  const context = stripHtml((quotation?.context ?? '').trim())
+  const whyItMatters = stripHtml((quotation?.whyItMatters ?? '').trim())
   const title = (book?.title ?? '').trim()
   const author = (book?.author ?? '').trim()
 
@@ -193,8 +187,8 @@ function addBookFullNotes(doc, book, startY) {
     const notes = (section.notes || []).sort((a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0))
     for (const note of notes) {
       const typeLabel = (note.type || 'note').replace(/_/g, ' ')
-      let content = (note.content || '').trim()
-      const subentries = (note.subentries || []).map((s) => s.content).filter(Boolean)
+      let content = stripHtml((note.content || '').trim())
+      const subentries = (note.subentries || []).map((s) => stripHtml(s.content || '')).filter(Boolean)
       if (subentries.length) content += '\n' + subentries.map((s) => `  • ${s}`).join('\n')
       const block = `[${typeLabel}] ${content}`
       y = addWrappedText(doc, block, MARGIN, y, CONTENT_WIDTH) + 2
@@ -289,8 +283,8 @@ function addBookNotesOnly(doc, book, startY) {
     const notes = (section.notes || []).sort((a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0))
     for (const note of notes) {
       const typeLabel = (note.type || 'note').replace(/_/g, ' ')
-      let content = (note.content || '').trim()
-      const subentries = (note.subentries || []).map((s) => s.content).filter(Boolean)
+      let content = stripHtml((note.content || '').trim())
+      const subentries = (note.subentries || []).map((s) => stripHtml(s.content || '')).filter(Boolean)
       if (subentries.length) content += '\n' + subentries.map((s) => `  • ${s}`).join('\n')
       const block = `[${typeLabel}] ${content}`
       y = addWrappedText(doc, block, MARGIN, y, CONTENT_WIDTH) + 2
@@ -450,9 +444,9 @@ export function buildEssayOutlinePdf(essay, citationStyle = 'mla') {
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(BODY_FONT_SIZE)
   const intro = outline.introduction || {}
-  if (intro.hook) y = addWrappedText(doc, `Hook: ${intro.hook}`, MARGIN, y, CONTENT_WIDTH) + 1
-  if (intro.context) y = addWrappedText(doc, `Context: ${intro.context}`, MARGIN, y, CONTENT_WIDTH) + 1
-  if (intro.thesis) y = addWrappedText(doc, `Thesis: ${intro.thesis}`, MARGIN, y, CONTENT_WIDTH) + 2
+  if (intro.hook) y = addWrappedText(doc, `Hook: ${stripHtml(intro.hook)}`, MARGIN, y, CONTENT_WIDTH) + 1
+  if (intro.context) y = addWrappedText(doc, `Context: ${stripHtml(intro.context)}`, MARGIN, y, CONTENT_WIDTH) + 1
+  if (intro.thesis) y = addWrappedText(doc, `Thesis: ${stripHtml(intro.thesis)}`, MARGIN, y, CONTENT_WIDTH) + 2
 
   const body = outline.bodyParagraphs || []
   if (body.length) {
@@ -467,11 +461,11 @@ export function buildEssayOutlinePdf(essay, citationStyle = 'mla') {
         y = MARGIN
       }
       y = addWrappedText(doc, `Paragraph ${i + 1}`, MARGIN, y, CONTENT_WIDTH) + 1
-      if (p.paragraphClaim) y = addWrappedText(doc, `Claim: ${p.paragraphClaim}`, MARGIN, y, CONTENT_WIDTH) + 1
+      if (p.paragraphClaim) y = addWrappedText(doc, `Claim: ${stripHtml(p.paragraphClaim)}`, MARGIN, y, CONTENT_WIDTH) + 1
       if (p.evidence) y = addWrappedText(doc, `Evidence: ${p.evidence}`, MARGIN, y, CONTENT_WIDTH) + 1
-      if (p.analysis) y = addWrappedText(doc, `Analysis: ${p.analysis}`, MARGIN, y, CONTENT_WIDTH) + 1
-      if (p.counterargument) y = addWrappedText(doc, `Counterargument: ${p.counterargument}`, MARGIN, y, CONTENT_WIDTH) + 1
-      if (p.response) y = addWrappedText(doc, `Response: ${p.response}`, MARGIN, y, CONTENT_WIDTH) + 1
+      if (p.analysis) y = addWrappedText(doc, `Analysis: ${stripHtml(p.analysis)}`, MARGIN, y, CONTENT_WIDTH) + 1
+      if (p.counterargument) y = addWrappedText(doc, `Counterargument: ${stripHtml(p.counterargument)}`, MARGIN, y, CONTENT_WIDTH) + 1
+      if (p.response) y = addWrappedText(doc, `Response: ${stripHtml(p.response)}`, MARGIN, y, CONTENT_WIDTH) + 1
       y += 3
     })
   }
@@ -486,7 +480,7 @@ export function buildEssayOutlinePdf(essay, citationStyle = 'mla') {
     y = addWrappedText(doc, 'Objection section', MARGIN, y, CONTENT_WIDTH, LINE_HEIGHT, HEADING_FONT_SIZE) + 2
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(BODY_FONT_SIZE)
-    y = addWrappedText(doc, outline.objectionSection, MARGIN, y, CONTENT_WIDTH) + 4
+    y = addWrappedText(doc, stripHtml(outline.objectionSection), MARGIN, y, CONTENT_WIDTH) + 4
   }
 
   const concl = outline.conclusion || {}
@@ -500,9 +494,9 @@ export function buildEssayOutlinePdf(essay, citationStyle = 'mla') {
     y = addWrappedText(doc, 'Conclusion', MARGIN, y, CONTENT_WIDTH, LINE_HEIGHT, HEADING_FONT_SIZE) + 2
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(BODY_FONT_SIZE)
-    if (concl.restateThesis) y = addWrappedText(doc, `Restate thesis: ${concl.restateThesis}`, MARGIN, y, CONTENT_WIDTH) + 1
-    if (concl.broaderImplication) y = addWrappedText(doc, `Broader implication: ${concl.broaderImplication}`, MARGIN, y, CONTENT_WIDTH) + 1
-    if (concl.whyItMatters) y = addWrappedText(doc, `Why it matters: ${concl.whyItMatters}`, MARGIN, y, CONTENT_WIDTH) + 2
+    if (concl.restateThesis) y = addWrappedText(doc, `Restate thesis: ${stripHtml(concl.restateThesis)}`, MARGIN, y, CONTENT_WIDTH) + 1
+    if (concl.broaderImplication) y = addWrappedText(doc, `Broader implication: ${stripHtml(concl.broaderImplication)}`, MARGIN, y, CONTENT_WIDTH) + 1
+    if (concl.whyItMatters) y = addWrappedText(doc, `Why it matters: ${stripHtml(concl.whyItMatters)}`, MARGIN, y, CONTENT_WIDTH) + 2
   }
 
   addPageNumbers(doc)
@@ -528,7 +522,7 @@ export function buildEssayDraftPdf(essay, citationStyle = 'mla') {
     y = addWrappedText(doc, 'Assignment prompt', MARGIN, y, CONTENT_WIDTH, LINE_HEIGHT, HEADING_FONT_SIZE) + 2
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(BODY_FONT_SIZE)
-    y = addWrappedText(doc, essay.prompt, MARGIN, y, CONTENT_WIDTH) + 4
+    y = addWrappedText(doc, stripHtml(essay.prompt || ''), MARGIN, y, CONTENT_WIDTH) + 4
   }
 
   const thesisRaw = essay?.tabContent?.thesisBuilder
@@ -545,8 +539,8 @@ export function buildEssayDraftPdf(essay, citationStyle = 'mla') {
       doc.setFont('helvetica', 'normal')
       doc.setFontSize(BODY_FONT_SIZE)
       if (thesis.workingThesis) y = addWrappedText(doc, thesis.workingThesis, MARGIN, y, CONTENT_WIDTH) + 2
-      if (thesis.myAnswer) y = addWrappedText(doc, `Main claim: ${thesis.myAnswer}`, MARGIN, y, CONTENT_WIDTH) + 1
-      if (thesis.whyItMatters) y = addWrappedText(doc, `Why it matters: ${thesis.whyItMatters}`, MARGIN, y, CONTENT_WIDTH) + 2
+      if (thesis.myAnswer) y = addWrappedText(doc, `Main claim: ${stripHtml(thesis.myAnswer)}`, MARGIN, y, CONTENT_WIDTH) + 1
+      if (thesis.whyItMatters) y = addWrappedText(doc, `Why it matters: ${stripHtml(thesis.whyItMatters)}`, MARGIN, y, CONTENT_WIDTH) + 2
     } catch {
       /* ignore */
     }
@@ -564,14 +558,14 @@ export function buildEssayDraftPdf(essay, citationStyle = 'mla') {
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(BODY_FONT_SIZE)
     const intro = outline.introduction || {}
-    if (intro.thesis) y = addWrappedText(doc, `Thesis: ${intro.thesis}`, MARGIN, y, CONTENT_WIDTH) + 2
+    if (intro.thesis) y = addWrappedText(doc, `Thesis: ${stripHtml(intro.thesis)}`, MARGIN, y, CONTENT_WIDTH) + 2
     const body = outline.bodyParagraphs || []
     body.forEach((p, i) => {
       if (y > PAGE_HEIGHT_MM - MARGIN - LINE_HEIGHT) {
         doc.addPage()
         y = MARGIN
       }
-      const claim = p.paragraphClaim || '(No claim)'
+      const claim = stripHtml(p.paragraphClaim || '') || '(No claim)'
       y = addWrappedText(doc, `${i + 1}. ${claim}`, MARGIN, y, CONTENT_WIDTH) + 1
       if (p.evidence) y = addWrappedText(doc, `   Evidence: ${p.evidence}`, MARGIN, y, CONTENT_WIDTH) + 1
       y += 2
@@ -632,7 +626,7 @@ export function buildEssayDraftPdf(essay, citationStyle = 'mla') {
     y = addWrappedText(doc, 'Content', MARGIN, y, CONTENT_WIDTH, LINE_HEIGHT, HEADING_FONT_SIZE) + 2
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(BODY_FONT_SIZE)
-    addWrappedText(doc, essay.content, MARGIN, y, CONTENT_WIDTH)
+    addWrappedText(doc, stripHtml(essay.content || ''), MARGIN, y, CONTENT_WIDTH)
   }
 
   addPageNumbers(doc)

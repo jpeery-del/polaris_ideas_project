@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import RichTextEditor from './RichTextEditor'
 
 export default function AddEssayModal({ onClose, onSave }) {
   const [title, setTitle] = useState('')
@@ -71,13 +72,12 @@ export default function AddEssayModal({ onClose, onSave }) {
           <label className="form-label" htmlFor="essay-prompt">
             Essay prompt
           </label>
-          <textarea
-            id="essay-prompt"
-            className="form-input form-textarea"
+          <RichTextEditor
             value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
+            onChange={setPrompt}
             placeholder="Paste or type the assignment prompt…"
-            rows={4}
+            minRows={4}
+            showSaveHint={false}
           />
 
           <label className="form-label" htmlFor="essay-course">

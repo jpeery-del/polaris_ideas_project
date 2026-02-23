@@ -12,6 +12,8 @@ import {
   reorderQuestions,
   reorderObjections,
 } from '../data/books'
+import RichTextEditor from './RichTextEditor'
+import { stripHtml } from '../utils/text'
 
 const REFRESH_DEBOUNCE_MS = 400
 const STRENGTH_OPTIONS = [
@@ -37,8 +39,8 @@ function QuestionCard({
   }
   const isDragging = dragState.draggingId === item.id
   const isDropTarget = dragState.dropTargetIndex === index
-  const titleDisplay = (item.question ?? '').trim().slice(0, 50) || 'Untitled question'
-  const display = titleDisplay.length >= 50 ? `${titleDisplay}…` : titleDisplay
+  const titleDisplay = stripHtml((item.question ?? '').trim()).slice(0, 50) || 'Untitled question'
+  const display = titleDisplay.length >= 50 ? titleDisplay + '…' : titleDisplay
 
   return (
     <div
@@ -78,36 +80,36 @@ function QuestionCard({
       {!collapsed && (
         <div className="qo-card-body">
           <label className="form-label qo-label">Question</label>
-          <textarea
-            className="form-input form-textarea qo-field qo-question"
+          <RichTextEditor
             value={item.question ?? ''}
-            onChange={(e) => onUpdate(bookId, item.id, { question: e.target.value })}
+            onChange={(html) => onUpdate(bookId, item.id, { question: html })}
             placeholder="What is unclear or worth probing?"
-            rows={2}
+            minRows={2}
+            showSaveHint={false}
           />
           <label className="form-label qo-label">Why this question matters</label>
-          <textarea
-            className="form-input form-textarea qo-field"
+          <RichTextEditor
             value={item.whyMatters ?? ''}
-            onChange={(e) => onUpdate(bookId, item.id, { whyMatters: e.target.value })}
+            onChange={(html) => onUpdate(bookId, item.id, { whyMatters: html })}
             placeholder="Stakes for understanding the text or argument"
-            rows={2}
+            minRows={2}
+            showSaveHint={false}
           />
           <label className="form-label qo-label">Possible answer</label>
-          <textarea
-            className="form-input form-textarea qo-field"
+          <RichTextEditor
             value={item.possibleAnswer ?? ''}
-            onChange={(e) => onUpdate(bookId, item.id, { possibleAnswer: e.target.value })}
+            onChange={(html) => onUpdate(bookId, item.id, { possibleAnswer: html })}
             placeholder="Your current or tentative answer"
-            rows={2}
+            minRows={2}
+            showSaveHint={false}
           />
           <label className="form-label qo-label">Remaining uncertainty</label>
-          <textarea
-            className="form-input form-textarea qo-field"
+          <RichTextEditor
             value={item.remainingUncertainty ?? ''}
-            onChange={(e) => onUpdate(bookId, item.id, { remainingUncertainty: e.target.value })}
+            onChange={(html) => onUpdate(bookId, item.id, { remainingUncertainty: html })}
             placeholder="What still needs scrutiny or evidence"
-            rows={2}
+            minRows={2}
+            showSaveHint={false}
           />
         </div>
       )}
@@ -134,8 +136,8 @@ function ObjectionCard({
   const isDragging = dragState.draggingId === item.id
   const isDropTarget = dragState.dropTargetIndex === index
   const keyArguments = getKeyArguments(book)
-  const titleDisplay = (item.objection ?? '').trim().slice(0, 50) || 'Untitled objection'
-  const display = titleDisplay.length >= 50 ? `${titleDisplay}…` : titleDisplay
+  const titleDisplay = stripHtml((item.objection ?? '').trim()).slice(0, 50) || 'Untitled objection'
+  const display = titleDisplay.length >= 50 ? titleDisplay + '…' : titleDisplay
 
   return (
     <div
@@ -175,12 +177,12 @@ function ObjectionCard({
       {!collapsed && (
         <div className="qo-card-body">
           <label className="form-label qo-label">Objection</label>
-          <textarea
-            className="form-input form-textarea qo-field qo-objection"
+          <RichTextEditor
             value={item.objection ?? ''}
-            onChange={(e) => onUpdate(bookId, item.id, { objection: e.target.value })}
+            onChange={(html) => onUpdate(bookId, item.id, { objection: html })}
             placeholder="A counter-argument or challenge to one of the key arguments"
-            rows={2}
+            minRows={2}
+            showSaveHint={false}
           />
           <label className="form-label qo-label">Target argument</label>
           <select
@@ -210,12 +212,12 @@ function ObjectionCard({
             ))}
           </select>
           <label className="form-label qo-label">Possible response</label>
-          <textarea
-            className="form-input form-textarea qo-field"
+          <RichTextEditor
             value={item.possibleResponse ?? ''}
-            onChange={(e) => onUpdate(bookId, item.id, { possibleResponse: e.target.value })}
+            onChange={(html) => onUpdate(bookId, item.id, { possibleResponse: html })}
             placeholder="How the argument might be defended or refined"
-            rows={3}
+            minRows={3}
+            showSaveHint={false}
           />
         </div>
       )}

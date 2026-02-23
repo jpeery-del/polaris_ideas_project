@@ -7,6 +7,8 @@ import {
   BOOK_TAB_KEYS,
   BOOK_TAB_LABELS,
 } from '../data/books'
+import SummaryTab from '../components/SummaryTab'
+import KeyArgumentsTab from '../components/KeyArgumentsTab'
 
 export default function BookPage() {
   const { id } = useParams()
@@ -18,7 +20,7 @@ export default function BookPage() {
   const book = getBookById(id)
 
   useEffect(() => {
-    if (book?.tabContent && activeTab) {
+    if (book?.tabContent && activeTab && activeTab !== 'summary') {
       setTabValue(book.tabContent[activeTab] ?? '')
     }
   }, [book?.id, activeTab, version])
@@ -109,14 +111,20 @@ export default function BookPage() {
       </div>
 
       <div className="book-workspace-panel">
-        <textarea
-          className="form-input book-workspace-textarea"
-          value={tabValue}
-          onChange={(e) => setTabValue(e.target.value)}
-          onBlur={handleTabBlur}
-          placeholder={`Add notes for ${BOOK_TAB_LABELS[activeTab]}…`}
-          rows={18}
-        />
+        {activeTab === 'summary' ? (
+          <SummaryTab book={currentBook} onRefresh={refresh} />
+        ) : activeTab === 'keyArguments' ? (
+          <KeyArgumentsTab book={currentBook} onRefresh={refresh} />
+        ) : (
+          <textarea
+            className="form-input book-workspace-textarea"
+            value={tabValue}
+            onChange={(e) => setTabValue(e.target.value)}
+            onBlur={handleTabBlur}
+            placeholder={`Add notes for ${BOOK_TAB_LABELS[activeTab]}…`}
+            rows={18}
+          />
+        )}
       </div>
     </div>
   )

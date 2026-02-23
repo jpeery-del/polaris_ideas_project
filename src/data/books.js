@@ -65,8 +65,37 @@ function loadBooks() {
       const tabContent = book.tabContent && typeof book.tabContent === 'object'
         ? { ...defaultTabContent(), ...book.tabContent }
         : defaultTabContent()
+      // Summary tab uses structured chapters; ensure array exists
+      const summaryChapters = Array.isArray(book.summaryChapters)
+        ? book.summaryChapters.map((ch, i) => ({
+            id: ch.id || crypto.randomUUID(),
+            title: ch.title ?? '',
+            pageRange: ch.pageRange ?? '',
+            mainThesis: ch.mainThesis ?? '',
+            summaryHtml: ch.summaryHtml ?? '',
+            order: ch.order ?? i,
+            collapsed: !!ch.collapsed,
+          }))
+        : []
+      // Key Arguments tab: structured argument cards
+      const keyArguments = Array.isArray(book.keyArguments)
+        ? book.keyArguments.map((arg, i) => ({
+            id: arg.id || crypto.randomUUID(),
+            title: arg.title ?? '',
+            claim: arg.claim ?? '',
+            premises: Array.isArray(arg.premises) ? arg.premises.map(p => (p && typeof p === 'string' ? p : '')) : [],
+            conclusion: arg.conclusion ?? '',
+            assumptions: arg.assumptions ?? '',
+            strengths: arg.strengths ?? '',
+            weaknesses: arg.weaknesses ?? '',
+            order: arg.order ?? i,
+            collapsed: !!arg.collapsed,
+          }))
+        : []
       return {
         ...book,
+        summaryChapters,
+        keyArguments,
         author: book.author ?? '',
         translator: book.translator ?? '',
         publisher: book.publisher ?? '',
@@ -142,6 +171,7 @@ export function createBook(opts) {
     sections: [],
     customTypes: [],
     tabContent: defaultTabContent(),
+    keyArguments: [],
     createdAt: new Date().toISOString(),
   }
   saveBook(book)
@@ -318,5 +348,138 @@ export function deleteSubentry(bookId, sectionId, noteId, subentryId) {
     }
   })
   saveBook({ ...book, sections })
+  return getBookById(bookId)
+}
+
+// ——— Summary tab: structured chapter-based summaries ———
+
+export function getSummaryChapters(book) {
+  const raw = book?.summaryChapters
+  if (!Array.isArray(raw)) return []
+  return [...raw].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+}
+
+export function addSummaryChapter(bookId) {
+  const book = getBookById(bookId)
+  if (!book) return null
+  const chapters = getSummaryChapters(book)
+  const chapter = {
+    id: crypto.randomUUID(),
+    title: '',
+    pageRange: '',
+    mainThesis: '',
+    summaryHtml: '',
+    order: chapters.length,
+    collapsed: false,
+  }
+  saveBook({ ...book, summaryChapters: [...chapters, chapter] })
+  return chapter
+}
+
+export function updateSummaryChapter(bookId, chapterId, updates) {
+  const book = getBookById(bookId)
+  if (!book || !Array.isArray(book.summaryChapters)) return null
+  const summaryChapters = book.summaryChapters.map(ch =>
+    ch.id === chapterId ? { ...ch, ...updates } : ch
+  )
+  saveBook({ ...book, summaryChapters })
+  return getBookById(bookId)
+}
+
+export function deleteSummaryChapter(bookId, chapterId) {
+  const book = getBookById(bookId)
+  if (!book || !Array.isArray(book.summaryChapters)) return null
+  const chapters = book.summaryChapters.filter(ch => ch.id !== chapterId)
+  chapters.forEach((ch, i) => { ch.order = i })
+  saveBook({ ...book, summaryChapters: chapters })
+  return getBookById(bookId)
+}
+
+export function reorderSummaryChapters(bookId, fromIndex, toIndex) {
+  const book = getBookById(bookId)
+  const chapters = getSummaryChapters(book)
+  if (fromIndex < 0 || toIndex < 0 || fromIndex >= chapters.length || toIndex >= chapters.length) return getBookById(bookId)
+  const [removed] = chapters.splice(fromIndex, 1)
+  chapters.splice(toIndex, 0, removed)
+  chapters.forEach((ch, i) => { ch.order = i })
+  saveBook({ ...book, summaryChapters: chapters })
+  return getBookById(bookId)
+}
+
+/**
+ * Returns structured summary content for PDF or other export.
+ * @param {Object} book - Book object
+ * @returns {{ title: string, author: string, chapters: Array<{ title: string, pageRange: string, mainThesis: string, summaryHtml: string }> }}
+ */
+export function getSummaryForExport(book) {
+  if (!book) return { title: '', author: '', chapters: [] }
+  const chapters = getSummaryChapters(book).map(ch => ({
+    title: ch.title || 'Untitled chapter',
+    pageRange: ch.pageRange || '',
+    mainThesis: ch.mainThesis || '',
+    summaryHtml: ch.summaryHtml || '',
+  }))
+  return {
+    title: book.title || '',
+    author: book.author || '',
+    chapters,
+  }
+}
+
+// ——— Key Arguments tab: structured argument cards ———
+
+export function getKeyArguments(book) {
+  const raw = book?.keyArguments
+  if (!Array.isArray(raw)) return []
+  return [...raw].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+}
+
+export function addKeyArgument(bookId) {
+  const book = getBookById(bookId)
+  if (!book) return null
+  const args = getKeyArguments(book)
+  const argument = {
+    id: crypto.randomUUID(),
+    title: '',
+    claim: '',
+    premises: [],
+    conclusion: '',
+    assumptions: '',
+    strengths: '',
+    weaknesses: '',
+    order: args.length,
+    collapsed: false,
+  }
+  saveBook({ ...book, keyArguments: [...args, argument] })
+  return argument
+}
+
+export function updateKeyArgument(bookId, argumentId, updates) {
+  const book = getBookById(bookId)
+  if (!book || !Array.isArray(book.keyArguments)) return null
+  const keyArguments = book.keyArguments.map(arg =>
+    arg.id === argumentId ? { ...arg, ...updates } : arg
+  )
+  saveBook({ ...book, keyArguments })
+  return getBookById(bookId)
+}
+
+export function deleteKeyArgument(bookId, argumentId) {
+  const book = getBookById(bookId)
+  if (!book || !Array.isArray(book.keyArguments)) return null
+  const args = book.keyArguments.filter(a => a.id !== argumentId)
+  args.forEach((a, i) => { a.order = i })
+  saveBook({ ...book, keyArguments: args })
+  return getBookById(bookId)
+}
+
+export function reorderKeyArguments(bookId, fromIndex, toIndex) {
+  const book = getBookById(bookId)
+  const args = getKeyArguments(book)
+  if (fromIndex < 0 || toIndex < 0 || fromIndex >= args.length || toIndex >= args.length) return getBookById(bookId)
+  const [removed] = args.splice(fromIndex, 1)
+  args.splice(toIndex, 0, removed)
+  args.forEach((a, i) => { a.order = i })
+  saveBook({ ...book, keyArguments: args })
   return getBookById(bookId)
 }

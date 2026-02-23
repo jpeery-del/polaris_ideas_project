@@ -1,12 +1,14 @@
 :root {
-  --ink: #1a1614;
-  --paper: #f5f0e8;
-  --paper-warm: #ebe4d8;
-  --accent: #6b5344;
-  --accent-light: #9a8577;
-  --gold: #a67c52;
-  --border: rgba(107, 83, 68, 0.25);
-  --shadow: rgba(26, 22, 20, 0.08);
+  --ink: #1c1917;
+  --paper: #faf8f5;
+  --paper-warm: #f2ede6;
+  --accent: #1e40af;
+  --accent-light: #64748b;
+  --accent-muted: #1d4ed8;
+  --gold: #d97706;
+  --border: rgba(30, 64, 175, 0.25);
+  --shadow: rgba(28, 25, 23, 0.1);
+  --danger: #b91c1c;
   --serif: 'Cormorant Garamond', Georgia, serif;
   --sans: 'Source Sans 3', system-ui, sans-serif;
 }
@@ -92,11 +94,11 @@ button {
   font-weight: 500;
 }
 .nav-link:hover {
-  background: rgba(107, 83, 68, 0.1);
+  background: rgba(30, 64, 175, 0.12);
   text-decoration: none;
 }
 .nav-link.active {
-  background: rgba(107, 83, 68, 0.15);
+  background: rgba(30, 64, 175, 0.18);
   color: var(--accent);
 }
 .nav-signin {
@@ -178,9 +180,9 @@ button {
   max-width: 520px;
   margin: 0 auto 1.5rem;
   padding: 1.25rem 1.5rem;
-  background: rgba(107, 83, 68, 0.06);
+  background: rgba(30, 64, 175, 0.08);
   border-radius: 10px;
-  border: 1px solid rgba(107, 83, 68, 0.12);
+  border: 1px solid rgba(30, 64, 175, 0.15);
 }
 .welcome-features-title {
   font-size: 1.1rem;
@@ -243,7 +245,7 @@ button {
   padding: 0.4rem 0.6rem;
 }
 .signin-form .form-error {
-  color: #b54a4a;
+  color: var(--danger);
   font-size: 0.9rem;
   margin: 0 0 0.5rem;
 }
@@ -675,7 +677,7 @@ button {
 }
 .essay-outline-body-block-drop-target {
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(107, 83, 68, 0.2);
+  box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.25);
 }
 .essay-outline-body-block-dragging {
   opacity: 0.6;
@@ -748,7 +750,7 @@ button {
   font-style: italic;
   padding: 1.25rem;
   margin: 0;
-  background: rgba(107, 83, 68, 0.06);
+  background: rgba(30, 64, 175, 0.08);
   border-radius: 8px;
 }
 .demo-section .tetralogy-title {
@@ -947,7 +949,7 @@ button {
   border: 1px solid var(--border);
 }
 .btn-secondary:hover {
-  background: rgba(107, 83, 68, 0.1);
+  background: rgba(30, 64, 175, 0.12);
   text-decoration: none;
 }
 .btn-sm {
@@ -956,7 +958,7 @@ button {
 }
 .btn.danger {
   background: transparent;
-  color: #b54a4a;
+  color: var(--danger);
   border: 1px solid rgba(181, 74, 74, 0.4);
 }
 .btn.danger:hover {
@@ -1015,7 +1017,7 @@ button {
 .passages-form {
   margin: 1.5rem 0;
   padding: 1.25rem;
-  background: rgba(107, 83, 68, 0.06);
+  background: rgba(30, 64, 175, 0.08);
   border-radius: 8px;
 }
 .passage-row {
@@ -1127,7 +1129,7 @@ button {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(26, 22, 20, 0.35);
+  background: rgba(28, 25, 23, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1186,7 +1188,7 @@ button {
   margin: 0 0 0.5rem;
 }
 .required {
-  color: #b54a4a;
+  color: var(--danger);
 }
 .tags-input-row {
   display: flex;
@@ -1224,7 +1226,7 @@ button {
   cursor: pointer;
 }
 .tag-chip-remove:hover {
-  color: #b54a4a;
+  color: var(--danger);
 }
 .modal-actions {
   margin-top: 1.5rem;
@@ -1338,7 +1340,7 @@ button {
   text-align: center;
   color: var(--accent-light);
   font-style: italic;
-  background: rgba(107, 83, 68, 0.06);
+  background: rgba(30, 64, 175, 0.08);
   border-radius: 8px;
   border: 1px dashed var(--border);
 }
@@ -1351,7 +1353,7 @@ button {
 }
 .summary-chapter-block.summary-chapter-drop-target {
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(107, 83, 68, 0.2);
+  box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.25);
 }
 .summary-chapter-block.summary-chapter-dragging {
   opacity: 0.6;
@@ -1509,7 +1511,7 @@ button {
   text-align: center;
   color: var(--accent-light);
   font-style: italic;
-  background: rgba(107, 83, 68, 0.06);
+  background: rgba(30, 64, 175, 0.08);
   border-radius: 8px;
   border: 1px dashed var(--border);
 }
@@ -1643,7 +1645,7 @@ button {
   text-align: center;
   color: var(--accent-light);
   font-style: italic;
-  background: rgba(107, 83, 68, 0.06);
+  background: rgba(30, 64, 175, 0.08);
   border-radius: 8px;
   border: 1px dashed var(--border);
 }
@@ -1656,7 +1658,7 @@ button {
 }
 .key-args-card.key-args-card-drop-target {
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(107, 83, 68, 0.2);
+  box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.25);
 }
 .key-args-card.key-args-card-dragging {
   opacity: 0.6;
@@ -1829,7 +1831,7 @@ button {
   text-align: center;
   color: var(--accent-light);
   font-style: italic;
-  background: rgba(107, 83, 68, 0.06);
+  background: rgba(30, 64, 175, 0.08);
   border-radius: 8px;
   border: 1px dashed var(--border);
 }
@@ -1842,7 +1844,7 @@ button {
 }
 .quotations-card.quotations-card-drop-target {
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(107, 83, 68, 0.2);
+  box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.25);
 }
 .quotations-card.quotations-card-dragging {
   opacity: 0.6;
@@ -1957,7 +1959,7 @@ button {
   padding: 0.2rem 0.5rem;
   font-size: 0.85rem;
   color: var(--accent);
-  background: rgba(107, 83, 68, 0.1);
+  background: rgba(30, 64, 175, 0.12);
   border-radius: 4px;
 }
 .quotations-tag-remove {
@@ -2001,7 +2003,7 @@ button {
   align-items: center;
   gap: 0.25rem;
   padding: 0.2rem 0.5rem;
-  background: rgba(107, 83, 68, 0.12);
+  background: rgba(30, 64, 175, 0.15);
   border-radius: 999px;
   font-size: 0.9rem;
 }
@@ -2337,7 +2339,7 @@ button {
   text-align: center;
   color: var(--accent-light);
   font-style: italic;
-  background: rgba(107, 83, 68, 0.06);
+  background: rgba(30, 64, 175, 0.08);
   border-radius: 8px;
   border: 1px dashed var(--border);
 }
@@ -2356,7 +2358,7 @@ button {
 }
 .qo-card.qo-card-drop-target {
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(107, 83, 68, 0.2);
+  box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.25);
 }
 .qo-card.qo-card-dragging {
   opacity: 0.6;
@@ -2509,7 +2511,7 @@ button {
   transition: background 0.2s;
 }
 .book-card-head:hover {
-  background: rgba(107, 83, 68, 0.06);
+  background: rgba(30, 64, 175, 0.08);
 }
 .book-card-head-inner {
   flex: 1;
@@ -2589,7 +2591,7 @@ button {
   border-radius: 4px;
 }
 .book-detail-title:hover {
-  background: rgba(107, 83, 68, 0.08);
+  background: rgba(30, 64, 175, 0.1);
 }
 .title-edit {
   flex: 1;
@@ -2661,7 +2663,7 @@ button {
   border-radius: 4px;
 }
 .section-block-title:hover {
-  background: rgba(107, 83, 68, 0.08);
+  background: rgba(30, 64, 175, 0.1);
 }
 .section-title-input {
   margin-bottom: 0;
@@ -2674,7 +2676,7 @@ button {
 }
 .entry-type-group {
   padding: 0.75rem;
-  background: rgba(107, 83, 68, 0.04);
+  background: rgba(30, 64, 175, 0.06);
   border-radius: 8px;
   border: 1px solid var(--border);
 }
@@ -2696,7 +2698,7 @@ button {
 }
 .entry-item {
   padding: 0.75rem;
-  background: rgba(107, 83, 68, 0.05);
+  background: rgba(30, 64, 175, 0.08);
   border-radius: 6px;
   border-left: 3px solid var(--accent-light);
 }
@@ -2712,7 +2714,7 @@ button {
   color: var(--accent);
   margin-bottom: 0.35rem;
   padding: 0.15rem 0.4rem;
-  background: rgba(107, 83, 68, 0.12);
+  background: rgba(30, 64, 175, 0.15);
   border-radius: 4px;
 }
 .note-content {
@@ -2728,7 +2730,7 @@ button {
 }
 .entry-add-form {
   padding: 0.75rem;
-  background: rgba(107, 83, 68, 0.06);
+  background: rgba(30, 64, 175, 0.08);
   border-radius: 6px;
 }
 .entry-add-type {
@@ -2759,7 +2761,7 @@ button {
 }
 .subentry-item {
   padding: 0.4rem 0;
-  border-bottom: 1px solid rgba(107, 83, 68, 0.1);
+  border-bottom: 1px solid rgba(30, 64, 175, 0.12);
 }
 .subentry-item:last-child {
   border-bottom: none;
@@ -2808,7 +2810,7 @@ button {
   border-radius: 4px;
 }
 .book-page-title-block:hover {
-  background: rgba(107, 83, 68, 0.06);
+  background: rgba(30, 64, 175, 0.08);
 }
 .book-page-title {
   font-size: 1.75rem;
@@ -2836,7 +2838,7 @@ button {
 .custom-types-block {
   margin: 1.5rem 0;
   padding: 1rem;
-  background: rgba(107, 83, 68, 0.06);
+  background: rgba(30, 64, 175, 0.08);
   border-radius: 8px;
 }
 .custom-types-header {
@@ -3126,7 +3128,7 @@ button {
   text-decoration: underline;
 }
 .btn-icon.danger {
-  color: #b54a4a;
+  color: var(--danger);
 }
 .note-body {
   margin: 0 0 0.5rem;

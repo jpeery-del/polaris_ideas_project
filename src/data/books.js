@@ -1,4 +1,5 @@
 const STORAGE_KEY_BOOKS = 'platonic-study-books'
+const STORAGE_KEY_THEMES = 'platonic-study-themes'
 
 /** Tab keys for philosophical book workspace (persisted in book.tabContent). */
 export const BOOK_TAB_KEYS = [
@@ -90,6 +91,7 @@ function loadBooks() {
             weaknesses: arg.weaknesses ?? '',
             order: arg.order ?? i,
             collapsed: !!arg.collapsed,
+            themeIds: Array.isArray(arg.themeIds) ? arg.themeIds : [],
           }))
         : []
       // Quotations tab: structured quotation entries
@@ -101,6 +103,7 @@ function loadBooks() {
             context: q.context ?? '',
             whyItMatters: q.whyItMatters ?? '',
             tags: Array.isArray(q.tags) ? q.tags.filter(t => typeof t === 'string' && t.trim()) : [],
+            themeIds: Array.isArray(q.themeIds) ? q.themeIds : [],
             order: q.order ?? i,
             collapsed: !!q.collapsed,
           }))
@@ -152,6 +155,8 @@ function loadBooks() {
         year: book.year ?? '',
         edition: book.edition ?? '',
         tags: Array.isArray(book.tags) ? book.tags : [],
+        linkedBookIds: Array.isArray(book.linkedBookIds) ? book.linkedBookIds : [],
+        themeIds: Array.isArray(book.themeIds) ? book.themeIds : [],
         customTypes: book.customTypes || [],
         sections,
         tabContent,
@@ -218,6 +223,8 @@ export function createBook(opts) {
     year: (year || '').toString().trim(),
     edition: (edition || '').toString().trim(),
     tags: tags.filter(Boolean).map(t => (typeof t === 'string' ? t : '').trim()).filter(Boolean),
+    linkedBookIds: [],
+    themeIds: [],
     sections: [],
     customTypes: [],
     tabContent: defaultTabContent(),
@@ -501,6 +508,7 @@ export function addKeyArgument(bookId) {
     assumptions: '',
     strengths: '',
     weaknesses: '',
+    themeIds: [],
     order: args.length,
     collapsed: false,
   }
@@ -557,6 +565,7 @@ export function addQuotation(bookId) {
     context: '',
     whyItMatters: '',
     tags: [],
+    themeIds: [],
     order: list.length,
     collapsed: false,
   }
@@ -780,4 +789,81 @@ export function reorderObjections(bookId, fromIndex, toIndex) {
   list.forEach((o, i) => { o.order = i })
   saveBook({ ...book, objections: list })
   return getBookById(bookId)
+}
+
+// ——— Global themes (manual linking only) ———
+
+function loadThemes() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_THEMES)
+    const themes = raw ? JSON.parse(raw) : []
+    return Array.isArray(themes) ? themes : []
+  } catch {
+    return []
+  }
+}
+
+function saveThemes(themes) {
+  localStorage.setItem(STORAGE_KEY_THEMES, JSON.stringify(themes))
+}
+
+export function getAllThemes() {
+  return loadThemes()
+}
+
+export function getThemeById(id) {
+  return loadThemes().find(t => t.id === id) || null
+}
+
+export function addTheme(name) {
+  const themes = loadThemes()
+  const trimmed = (name || '').trim()
+  if (!trimmed) return null
+  const existing = themes.find(t => t.name.toLowerCase() === trimmed.toLowerCase())
+  if (existing) return existing
+  const theme = { id: crypto.randomUUID(), name: trimmed }
+  saveThemes([...themes, theme])
+  return theme
+}
+
+export function updateTheme(id, updates) {
+  const themes = loadThemes()
+  const index = themes.findIndex(t => t.id === id)
+  if (index < 0) return null
+  const next = themes.map((t, i) => (i === index ? { ...t, ...updates } : t))
+  saveThemes(next)
+  return next[index]
+}
+
+export function deleteTheme(id) {
+  saveThemes(loadThemes().filter(t => t.id !== id))
+}
+
+/** Books that have this theme linked (book.themeIds). */
+export function getBooksByThemeId(themeId) {
+  return loadBooks().filter(b => (b.themeIds || []).includes(themeId))
+}
+
+/** All quotations linked to this theme across books. Returns { book, quotation }[]. */
+export function getQuotationsByThemeId(themeId) {
+  const books = loadBooks()
+  const out = []
+  for (const book of books) {
+    for (const q of book.quotations || []) {
+      if ((q.themeIds || []).includes(themeId)) out.push({ book, quotation: q })
+    }
+  }
+  return out
+}
+
+/** All key arguments linked to this theme across books. Returns { book, argument }[]. */
+export function getArgumentsByThemeId(themeId) {
+  const books = loadBooks()
+  const out = []
+  for (const book of books) {
+    for (const arg of book.keyArguments || []) {
+      if ((arg.themeIds || []).includes(themeId)) out.push({ book, argument: arg })
+    }
+  }
+  return out
 }

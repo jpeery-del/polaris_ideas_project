@@ -12,6 +12,7 @@ import KeyArgumentsTab from '../components/KeyArgumentsTab'
 import QuotationsTab from '../components/QuotationsTab'
 import PhilosophicalAnalysisTab from '../components/PhilosophicalAnalysisTab'
 import QuestionsObjectionsTab from '../components/QuestionsObjectionsTab'
+import CrossConnectionsTab from '../components/CrossConnectionsTab'
 
 export default function BookPage() {
   const { id } = useParams()
@@ -23,7 +24,7 @@ export default function BookPage() {
   const book = getBookById(id)
 
   useEffect(() => {
-    if (book?.tabContent && activeTab && activeTab !== 'summary' && activeTab !== 'keyArguments' && activeTab !== 'quotations' && activeTab !== 'philosophicalAnalysis' && activeTab !== 'questionsObjections') {
+    if (book?.tabContent && activeTab && activeTab !== 'summary' && activeTab !== 'keyArguments' && activeTab !== 'quotations' && activeTab !== 'philosophicalAnalysis' && activeTab !== 'questionsObjections' && activeTab !== 'crossConnections') {
       setTabValue(book.tabContent[activeTab] ?? '')
     }
   }, [book?.id, activeTab, version])
@@ -41,7 +42,7 @@ export default function BookPage() {
   }
 
   const handleTabBlur = () => {
-    const structuredTabs = ['summary', 'keyArguments', 'quotations', 'philosophicalAnalysis', 'questionsObjections']
+    const structuredTabs = ['summary', 'keyArguments', 'quotations', 'philosophicalAnalysis', 'questionsObjections', 'crossConnections']
     if (structuredTabs.includes(activeTab)) return
     const content = (currentBook.tabContent || {})[activeTab]
     if (content === tabValue) return
@@ -126,6 +127,8 @@ export default function BookPage() {
           <PhilosophicalAnalysisTab book={currentBook} onRefresh={refresh} />
         ) : activeTab === 'questionsObjections' ? (
           <QuestionsObjectionsTab book={currentBook} onRefresh={refresh} />
+        ) : activeTab === 'crossConnections' ? (
+          <CrossConnectionsTab book={currentBook} onRefresh={refresh} />
         ) : (
           <textarea
             className="form-input book-workspace-textarea"

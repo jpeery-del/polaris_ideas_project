@@ -5,7 +5,9 @@ import {
   updateKeyArgument,
   deleteKeyArgument,
   reorderKeyArguments,
+  getAllThemes,
 } from '../data/books'
+import ThemeIdsPicker from './ThemeIdsPicker'
 
 function PremisesList({ premises, onChange }) {
   const addPremise = () => onChange([...(premises || []), ''])
@@ -63,6 +65,7 @@ function ArgumentCard({
   argument,
   index,
   bookId,
+  allThemes,
   onUpdate,
   onDelete,
   dragState,
@@ -180,6 +183,13 @@ function ArgumentCard({
             placeholder="Notable weaknesses or objections"
             rows={2}
           />
+
+          <label className="form-label key-args-label">Shared themes</label>
+          <ThemeIdsPicker
+            themeIds={argument.themeIds || []}
+            allThemes={allThemes}
+            onChange={(themeIds) => onUpdate(bookId, argument.id, { themeIds })}
+          />
         </div>
       )}
     </div>
@@ -189,6 +199,7 @@ function ArgumentCard({
 const REFRESH_DEBOUNCE_MS = 400
 
 export default function KeyArgumentsTab({ book, onRefresh }) {
+  const allThemes = getAllThemes()
   const argumentsList = getKeyArguments(book)
   const [dragState, setDragState] = useState({ draggingId: null, dropTargetIndex: null })
   const refreshTimeoutRef = useRef(null)
@@ -284,6 +295,7 @@ export default function KeyArgumentsTab({ book, onRefresh }) {
             argument={arg}
             index={index}
             bookId={book.id}
+            allThemes={allThemes}
             onUpdate={handleUpdate}
             onDelete={handleDelete}
             dragState={dragState}

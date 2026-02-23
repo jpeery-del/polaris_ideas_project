@@ -6,7 +6,9 @@ import {
   deleteQuotation,
   setQuotationsOrder,
   formatQuotationCitation,
+  getAllThemes,
 } from '../data/books'
+import ThemeIdsPicker from './ThemeIdsPicker'
 
 function TagsInput({ tags, onChange, placeholder }) {
   const [input, setInput] = useState('')
@@ -71,6 +73,7 @@ function QuotationCard({
   index,
   bookId,
   book,
+  allThemes,
   onUpdate,
   onDelete,
   dragState,
@@ -85,6 +88,7 @@ function QuotationCard({
   const isDragging = dragState.draggingId === quotation.id
   const isDropTarget = dragState.dropTargetIndex === index
   const handleTagsChange = (tags) => onUpdate(bookId, quotation.id, { tags })
+  const handleThemeIdsChange = (themeIds) => onUpdate(bookId, quotation.id, { themeIds })
   const citationText = formatQuotationCitation(quotation, book, 'plain')
   const handleCopyCitation = () => {
     if (citationText) {
@@ -176,11 +180,17 @@ function QuotationCard({
             placeholder="Your analysis of why this quotation matters"
             rows={3}
           />
-          <label className="form-label quotations-label">Tags (themes)</label>
+          <label className="form-label quotations-label">Tags (free-form)</label>
           <TagsInput
             tags={quotation.tags}
             onChange={handleTagsChange}
             placeholder="e.g. virtue, knowledge"
+          />
+          <label className="form-label quotations-label">Shared themes</label>
+          <ThemeIdsPicker
+            themeIds={quotation.themeIds || []}
+            allThemes={allThemes}
+            onChange={handleThemeIdsChange}
           />
         </div>
       )}
@@ -191,6 +201,7 @@ function QuotationCard({
 const REFRESH_DEBOUNCE_MS = 400
 
 export default function QuotationsTab({ book, onRefresh }) {
+  const allThemes = getAllThemes()
   const allQuotations = getQuotations(book)
   const [sortBy, setSortBy] = useState('page')
   const [filterTag, setFilterTag] = useState('')
@@ -353,6 +364,7 @@ export default function QuotationsTab({ book, onRefresh }) {
             index={index}
             bookId={book.id}
             book={book}
+            allThemes={allThemes}
             onUpdate={handleUpdate}
             onDelete={handleDelete}
             dragState={dragState}

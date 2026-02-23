@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 const nav = [
   { to: '/', label: 'Welcome' },
   { to: '/books', label: 'Books' },
+  { to: '/themes', label: 'Themes' },
   { to: '/essays', label: 'Essays' },
 ]
 
@@ -23,7 +24,7 @@ export default function Layout({ children }) {
             <Link
               key={to}
               to={to}
-              className={`nav-link ${location.pathname === to || (to === '/books' && (location.pathname === '/books' || location.pathname.startsWith('/book/'))) || (to === '/essays' && location.pathname.startsWith('/essays')) ? 'active' : ''}`}
+              className={`nav-link ${location.pathname === to || (to === '/books' && (location.pathname === '/books' || location.pathname.startsWith('/book/'))) || (to === '/themes' && (location.pathname === '/themes' || location.pathname.startsWith('/themes/'))) || (to === '/essays' && location.pathname.startsWith('/essays')) ? 'active' : ''}`}
             >
               {label}
             </Link>

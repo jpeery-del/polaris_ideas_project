@@ -1565,6 +1565,313 @@ button {
 .quotations-tag-add {
   flex-shrink: 0;
 }
+.quotations-themes-wrap {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.quotations-themes-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.5rem;
+}
+.quotations-theme-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.5rem;
+  background: rgba(107, 83, 68, 0.12);
+  border-radius: 999px;
+  font-size: 0.9rem;
+}
+.quotations-theme-link {
+  color: var(--accent);
+  text-decoration: none;
+}
+.quotations-theme-link:hover {
+  text-decoration: underline;
+}
+.quotations-theme-select {
+  max-width: 16rem;
+  font-size: 0.9rem;
+}
+.quotations-themes-hint {
+  font-size: 0.9rem;
+  color: var(--accent-light);
+}
+
+/* Cross-Connections tab: book links + theme links (manual only) */
+.cross-connections-tab {
+  margin-top: 0.5rem;
+  max-width: 52em;
+}
+.cross-connections-intro {
+  margin: 0 0 1.5rem;
+  font-size: 0.95rem;
+  color: var(--accent-light);
+  line-height: 1.5;
+}
+.cross-connections-intro a {
+  color: var(--accent);
+  text-decoration: none;
+}
+.cross-connections-intro a:hover {
+  text-decoration: underline;
+}
+.cross-connections-section {
+  margin-bottom: 2rem;
+}
+.cross-connections-heading {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 0.35rem;
+  color: var(--ink);
+}
+.cross-connections-hint {
+  font-size: 0.9rem;
+  color: var(--accent-light);
+  margin: 0 0 0.75rem;
+  line-height: 1.45;
+}
+.cross-connections-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+}
+.cross-connections-list-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+.cross-connections-book-link,
+.cross-connections-theme-link {
+  color: var(--accent);
+  text-decoration: none;
+}
+.cross-connections-book-link:hover,
+.cross-connections-theme-link:hover {
+  text-decoration: underline;
+}
+.cross-connections-meta {
+  color: var(--accent-light);
+  font-size: 0.95rem;
+}
+.cross-connections-remove {
+  flex-shrink: 0;
+  padding: 0.2rem 0.4rem;
+  color: var(--accent-light);
+}
+.cross-connections-remove:hover {
+  color: var(--accent);
+}
+.cross-connections-add-wrap {
+  margin-top: 0.5rem;
+}
+.cross-connections-label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.9rem;
+  color: var(--accent-light);
+}
+.cross-connections-select {
+  max-width: 20rem;
+  font-size: 0.95rem;
+}
+.cross-connections-theme-add-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+.cross-connections-theme-input {
+  flex: 1;
+  max-width: 18rem;
+}
+.cross-connections-select-existing {
+  margin-top: 0.5rem;
+}
+.cross-connections-in-book {
+  font-size: 0.95rem;
+  color: var(--accent-light);
+  margin-bottom: 0.5rem;
+  line-height: 1.45;
+}
+.cross-connections-empty {
+  font-size: 0.9rem;
+  color: var(--accent-light);
+  font-style: italic;
+  margin: 0;
+}
+
+/* Themes index & theme detail page */
+.themes-page {
+  padding: 0 0 2rem;
+}
+.themes-index-header,
+.themes-detail-header {
+  margin-bottom: 1.5rem;
+}
+.themes-index-header h1,
+.themes-detail-title {
+  font-family: var(--serif);
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0 0 0.5rem;
+}
+.themes-detail-title {
+  cursor: pointer;
+  display: inline-block;
+}
+.themes-detail-title:hover {
+  color: var(--accent);
+}
+.themes-index-desc {
+  font-size: 0.95rem;
+  color: var(--accent-light);
+  line-height: 1.5;
+  margin: 0 0 1rem;
+}
+.themes-index-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.themes-new-input {
+  width: 18rem;
+  max-width: 100%;
+  font-size: 1rem;
+}
+.themes-index-list {
+  margin-top: 1rem;
+}
+.themes-empty {
+  font-size: 0.95rem;
+  color: var(--accent-light);
+  font-style: italic;
+  margin: 0;
+}
+.themes-grid {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+.themes-card {
+  display: block;
+  padding: 1rem 1.25rem;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px var(--shadow);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.themes-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 2px 8px var(--shadow);
+}
+.themes-card-name {
+  font-weight: 600;
+  font-size: 1.05rem;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+.themes-card-hint {
+  font-size: 0.85rem;
+  color: var(--accent-light);
+}
+.themes-detail .breadcrumb {
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+.themes-detail .breadcrumb a {
+  color: var(--accent);
+  text-decoration: none;
+}
+.themes-detail .breadcrumb a:hover {
+  text-decoration: underline;
+}
+.themes-detail-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 1rem;
+  justify-content: space-between;
+}
+.themes-title-edit {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.themes-title-input {
+  font-size: 1.25rem;
+  width: 16rem;
+  max-width: 100%;
+}
+.themes-detail-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+.themes-detail-section {
+  margin-bottom: 2rem;
+}
+.themes-detail-section h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem;
+  color: var(--ink);
+}
+.themes-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.themes-list li {
+  margin-bottom: 0.5rem;
+}
+.themes-link {
+  color: var(--accent);
+  text-decoration: none;
+}
+.themes-link:hover {
+  text-decoration: underline;
+}
+.themes-meta {
+  color: var(--accent-light);
+  font-size: 0.95rem;
+}
+.themes-quotation-item,
+.themes-argument-item {
+  margin-bottom: 0.75rem;
+  padding-left: 0.5rem;
+  border-left: 2px solid var(--border);
+}
+.themes-quotation-text {
+  display: block;
+  font-style: italic;
+  color: var(--ink);
+  margin-bottom: 0.25rem;
+}
+.themes-quotation-source,
+.themes-argument-source {
+  font-size: 0.9rem;
+  color: var(--accent-light);
+}
+.themes-argument-title {
+  font-weight: 600;
+  margin-right: 0.25rem;
+}
+.themes-argument-claim {
+  font-style: italic;
+  color: var(--ink);
+}
 
 /* Questions & Objections tab: critical thinking (no AI) */
 .qo-tab {

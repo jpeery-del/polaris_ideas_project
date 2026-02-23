@@ -92,10 +92,24 @@ function loadBooks() {
             collapsed: !!arg.collapsed,
           }))
         : []
+      // Quotations tab: structured quotation entries
+      const quotations = Array.isArray(book.quotations)
+        ? book.quotations.map((q, i) => ({
+            id: q.id || crypto.randomUUID(),
+            quoteText: q.quoteText ?? '',
+            pageNumber: q.pageNumber ?? '',
+            context: q.context ?? '',
+            whyItMatters: q.whyItMatters ?? '',
+            tags: Array.isArray(q.tags) ? q.tags.filter(t => typeof t === 'string' && t.trim()) : [],
+            order: q.order ?? i,
+            collapsed: !!q.collapsed,
+          }))
+        : []
       return {
         ...book,
         summaryChapters,
         keyArguments,
+        quotations,
         author: book.author ?? '',
         translator: book.translator ?? '',
         publisher: book.publisher ?? '',
@@ -172,6 +186,7 @@ export function createBook(opts) {
     customTypes: [],
     tabContent: defaultTabContent(),
     keyArguments: [],
+    quotations: [],
     createdAt: new Date().toISOString(),
   }
   saveBook(book)
@@ -482,4 +497,98 @@ export function reorderKeyArguments(bookId, fromIndex, toIndex) {
   args.forEach((a, i) => { a.order = i })
   saveBook({ ...book, keyArguments: args })
   return getBookById(bookId)
+}
+
+// ——— Quotations tab: structured quotation entries ———
+
+export function getQuotations(book) {
+  const raw = book?.quotations
+  if (!Array.isArray(raw)) return []
+  return [...raw].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+}
+
+export function addQuotation(bookId) {
+  const book = getBookById(bookId)
+  if (!book) return null
+  const list = getQuotations(book)
+  const entry = {
+    id: crypto.randomUUID(),
+    quoteText: '',
+    pageNumber: '',
+    context: '',
+    whyItMatters: '',
+    tags: [],
+    order: list.length,
+    collapsed: false,
+  }
+  saveBook({ ...book, quotations: [...list, entry] })
+  return entry
+}
+
+export function updateQuotation(bookId, quotationId, updates) {
+  const book = getBookById(bookId)
+  if (!book || !Array.isArray(book.quotations)) return null
+  const quotations = book.quotations.map(q =>
+    q.id === quotationId ? { ...q, ...updates } : q
+  )
+  saveBook({ ...book, quotations })
+  return getBookById(bookId)
+}
+
+export function deleteQuotation(bookId, quotationId) {
+  const book = getBookById(bookId)
+  if (!book || !Array.isArray(book.quotations)) return null
+  const list = book.quotations.filter(q => q.id !== quotationId)
+  list.forEach((q, i) => { q.order = i })
+  saveBook({ ...book, quotations: list })
+  return getBookById(bookId)
+}
+
+export function reorderQuotations(bookId, fromIndex, toIndex) {
+  const book = getBookById(bookId)
+  const list = getQuotations(book)
+  if (fromIndex < 0 || toIndex < 0 || fromIndex >= list.length || toIndex >= list.length) return getBookById(bookId)
+  const [removed] = list.splice(fromIndex, 1)
+  list.splice(toIndex, 0, removed)
+  list.forEach((q, i) => { q.order = i })
+  saveBook({ ...book, quotations: list })
+  return getBookById(bookId)
+}
+
+/** Set quotation order from an array of quotation ids (for drag-drop in sorted/filtered view). */
+export function setQuotationsOrder(bookId, quotationIdsInOrder) {
+  const book = getBookById(bookId)
+  if (!book || !Array.isArray(book.quotations)) return null
+  const idSet = new Set(quotationIdsInOrder)
+  const idToIndex = Object.fromEntries(quotationIdsInOrder.map((id, i) => [id, i]))
+  const others = book.quotations.filter(q => !idSet.has(q.id)).sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+  const base = quotationIdsInOrder.length
+  others.forEach((q, i) => { idToIndex[q.id] = base + i })
+  const quotations = book.quotations.map(q => ({
+    ...q,
+    order: idToIndex[q.id] ?? q.order,
+  }))
+  saveBook({ ...book, quotations })
+  return getBookById(bookId)
+}
+
+/**
+ * Format a quotation as citation-ready text. style: 'plain' | 'mla' | 'apa' (mla/apa reserved for future export).
+ * @param {Object} quotation - { quoteText, pageNumber, context, whyItMatters, tags }
+ * @param {Object} book - { title, author }
+ * @returns {string}
+ */
+export function formatQuotationCitation(quotation, book, style = 'plain') {
+  const quote = (quotation?.quoteText ?? '').trim()
+  const page = (quotation?.pageNumber ?? '').trim()
+  const title = (book?.title ?? '').trim()
+  const author = (book?.author ?? '').trim()
+  const parts = []
+  if (quote) parts.push(`"${quote}"`)
+  if (page) parts.push(`(p. ${page})`)
+  if (title || author) {
+    const src = [author, title].filter(Boolean).join(', ')
+    if (src) parts.push(`— ${src}`)
+  }
+  return parts.join(' ')
 }

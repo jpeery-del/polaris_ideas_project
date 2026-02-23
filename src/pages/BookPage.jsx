@@ -9,6 +9,7 @@ import {
 } from '../data/books'
 import SummaryTab from '../components/SummaryTab'
 import KeyArgumentsTab from '../components/KeyArgumentsTab'
+import QuotationsTab from '../components/QuotationsTab'
 
 export default function BookPage() {
   const { id } = useParams()
@@ -20,7 +21,7 @@ export default function BookPage() {
   const book = getBookById(id)
 
   useEffect(() => {
-    if (book?.tabContent && activeTab && activeTab !== 'summary') {
+    if (book?.tabContent && activeTab && activeTab !== 'summary' && activeTab !== 'keyArguments' && activeTab !== 'quotations') {
       setTabValue(book.tabContent[activeTab] ?? '')
     }
   }, [book?.id, activeTab, version])
@@ -38,6 +39,8 @@ export default function BookPage() {
   }
 
   const handleTabBlur = () => {
+    const structuredTabs = ['summary', 'keyArguments', 'quotations']
+    if (structuredTabs.includes(activeTab)) return
     const content = (currentBook.tabContent || {})[activeTab]
     if (content === tabValue) return
     saveBook({
@@ -115,6 +118,8 @@ export default function BookPage() {
           <SummaryTab book={currentBook} onRefresh={refresh} />
         ) : activeTab === 'keyArguments' ? (
           <KeyArgumentsTab book={currentBook} onRefresh={refresh} />
+        ) : activeTab === 'quotations' ? (
+          <QuotationsTab book={currentBook} onRefresh={refresh} />
         ) : (
           <textarea
             className="form-input book-workspace-textarea"

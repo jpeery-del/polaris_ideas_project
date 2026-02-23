@@ -1,33 +1,53 @@
 const STORAGE_KEY_BOOKS = 'platonic-study-books'
 
 export const NOTE_TYPES = [
-  { id: 'event', label: 'Event' },
-  { id: 'question', label: 'Question' },
-  { id: 'argument', label: 'Argument' },
+  { id: 'summary', label: 'Summary notes' },
+  { id: 'key_concept', label: 'Key concepts' },
+  { id: 'quotation', label: 'Quotations' },
+  { id: 'question', label: 'Questions' },
+  { id: 'implication', label: 'Implications' },
   { id: 'note', label: 'Note' },
-  { id: 'other', label: 'Other' },
 ]
+
+/** Only Book Overview section uses these 5 structured types. */
+export const BOOK_OVERVIEW_NOTE_TYPES = NOTE_TYPES.filter(t => t.id !== 'note')
 
 function loadBooks() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY_BOOKS)
     const books = raw ? JSON.parse(raw) : []
-    return books.map(book => ({
-      ...book,
-      author: book.author ?? '',
-      translator: book.translator ?? '',
-      publisher: book.publisher ?? '',
-      customTypes: book.customTypes || [],
-      sections: (book.sections || []).map((sec, i) => ({
+    const legacyTypeMap = { idea: 'summary', event: 'summary', argument: 'implication', note: 'summary', other: 'summary' }
+    let didMigrate = false
+    const result = books.map(book => {
+      let sections = (book.sections || []).map((sec, i) => ({
         ...sec,
         order: sec.order ?? i,
-        notes: (sec.notes || []).map(n => ({
-          ...n,
-          type: n.type === 'idea' ? 'event' : n.type === 'other' ? 'note' : n.type,
-          subentries: n.subentries || [],
-        })),
-      })),
-    }))
+        notes: (sec.notes || []).map(n => {
+          const type = NOTE_TYPES.some(t => t.id === n.type) ? n.type : (legacyTypeMap[n.type] ?? 'summary')
+          return { ...n, type, subentries: n.subentries || [] }
+        }),
+      }))
+      // Migrate "Character and concept index" → "Character index" + "Concept index"
+      const expanded = sections.flatMap(sec =>
+        sec.title === 'Character and concept index'
+          ? (didMigrate = true, [
+              { ...sec, title: 'Character index' },
+              { id: crypto.randomUUID(), title: 'Concept index', notes: [], order: sec.order + 1 },
+            ])
+          : [sec]
+      )
+      sections = expanded.map((sec, i) => ({ ...sec, order: i }))
+      return {
+        ...book,
+        author: book.author ?? '',
+        translator: book.translator ?? '',
+        publisher: book.publisher ?? '',
+        customTypes: book.customTypes || [],
+        sections,
+      }
+    })
+    if (didMigrate) saveBooks(result)
+    return result
   } catch {
     return []
   }
@@ -59,6 +79,13 @@ export function deleteBook(id) {
   saveBooks(loadBooks().filter(b => b.id !== id))
 }
 
+const DEFAULT_SECTIONS = [
+  'Book Overview',
+  'Character index',
+  'Concept index',
+  'Argument map',
+]
+
 export function createBook(title, author = '', translator = '', publisher = '') {
   const book = {
     id: crypto.randomUUID(),
@@ -66,7 +93,12 @@ export function createBook(title, author = '', translator = '', publisher = '') 
     author: (author || '').trim(),
     translator: (translator || '').trim(),
     publisher: (publisher || '').trim(),
-    sections: [],
+    sections: DEFAULT_SECTIONS.map((sectionTitle, order) => ({
+      id: crypto.randomUUID(),
+      title: sectionTitle,
+      notes: [],
+      order,
+    })),
     customTypes: [],
     createdAt: new Date().toISOString(),
   }
@@ -148,7 +180,7 @@ export function addNote(bookId, sectionId, type, content) {
   if (!book || !book.sections) return null
   const note = {
     id: crypto.randomUUID(),
-    type: (type && (NOTE_TYPES.some(t => t.id === type) || type.startsWith('custom-'))) ? type : 'note',
+    type: (type && NOTE_TYPES.some(t => t.id === type)) ? type : 'note',
     content: (content || '').trim(),
     subentries: [],
     createdAt: new Date().toISOString(),

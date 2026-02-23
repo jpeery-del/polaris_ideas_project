@@ -623,7 +623,7 @@ button {
   flex-wrap: wrap;
 }
 
-/* Books */
+/* Book Workspace */
 .books-page {
   padding-bottom: 2rem;
 }
@@ -848,6 +848,28 @@ button {
 .section-title-input {
   margin-bottom: 0;
   font-size: 1.1rem;
+}
+.entries-by-type {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.entry-type-group {
+  padding: 0.75rem;
+  background: rgba(107, 83, 68, 0.04);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+.entry-type-group-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin: 0 0 0.75rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border);
+}
+.entry-type-group .entries-list {
+  gap: 0.75rem;
 }
 .entries-list {
   display: flex;

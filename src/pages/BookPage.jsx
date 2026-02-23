@@ -45,7 +45,7 @@ export default function BookPage() {
     return (
       <div className="book-page">
         <p>Book not found.</p>
-        <Link to="/books">← Back to Book notes</Link>
+        <Link to="/books">← Back to Book Workspace</Link>
       </div>
     )
   }
@@ -97,7 +97,7 @@ export default function BookPage() {
   return (
     <div className="book-page">
       <nav className="breadcrumb">
-        <Link to="/books">Book notes</Link>
+        <Link to="/books">Book Workspace</Link>
         <span className="sep">/</span>
         <span>{currentBook.title}</span>
       </nav>
@@ -151,7 +151,7 @@ export default function BookPage() {
           </div>
         )}
         <div className="book-page-actions">
-          <Link to="/books" className="btn btn-secondary">← All book notes</Link>
+          <Link to="/books" className="btn btn-secondary">← All workspaces</Link>
           <button type="button" className="btn danger" onClick={handleDeleteBook}>Delete book</button>
         </div>
       </header>
@@ -211,16 +211,14 @@ export default function BookPage() {
             section={section}
             sectionIndex={idx}
             sectionCount={arr.length}
-            newEntry={newEntryByKey[section.id]}
-            setNewEntry={obj => setNewEntryByKey(prev => ({ ...prev, [section.id]: obj }))}
+            newEntryByKey={newEntryByKey}
+            setNewEntryByKey={setNewEntryByKey}
             editingNote={editingNote}
             setEditingNote={setEditingNote}
             newSubentryByKey={newSubentryByKey}
             setNewSubentryByKey={setNewSubentryByKey}
             editingSubentry={editingSubentry}
             setEditingSubentry={setEditingSubentry}
-            newCustomTypeLabel={newCustomTypeLabel}
-            setNewCustomTypeLabel={setNewCustomTypeLabel}
             onMutate={refresh}
           />
         ))}

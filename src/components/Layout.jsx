@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext'
 
 const nav = [
   { to: '/', label: 'Welcome' },
-  { to: '/books', label: 'Book notes' },
+  { to: '/books', label: 'Book Workspace' },
   { to: '/essays', label: 'Essays' },
 ]
 
@@ -16,7 +16,7 @@ export default function Layout({ children }) {
       <header className="header">
         <Link to="/" className="logo">
           <span className="logo-icon">◇</span>
-          Platonic Study
+          Dialogue Buddy
         </Link>
         <nav className="nav">
           {nav.map(({ to, label }) => (

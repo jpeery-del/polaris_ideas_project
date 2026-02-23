@@ -1,4 +1,4 @@
-# Platonic Study
+# Dialogue Buddy
 
 Organize your reading and thinking: book notes by section, essays, and ideas—with username/password sign-in.
 

@@ -49,7 +49,7 @@ export default function Welcome() {
   return (
     <div className="welcome-page">
       <div className="welcome-hero">
-        <h1 className="welcome-title">Platonic Study</h1>
+        <h1 className="welcome-title">Dialogue Buddy</h1>
         <p className="welcome-tagline">Organize your reading and thinking.</p>
 
         {user ? (
@@ -59,14 +59,14 @@ export default function Welcome() {
               Keep notes on books by section, draft essays, and track ideas, questions, and arguments—all in one place.
             </p>
             <div className="welcome-actions">
-              <Link to="/books" className="btn btn-primary welcome-btn">Book notes</Link>
+              <Link to="/books" className="btn btn-primary welcome-btn">Book Workspace</Link>
               <Link to="/essays" className="btn btn-secondary welcome-btn">Essays</Link>
               <button type="button" className="btn btn-secondary welcome-btn" onClick={signOut}>Sign out</button>
             </div>
           </>
         ) : (
           <>
-            <p className="welcome-statement">Welcome to Platonic Study.</p>
+            <p className="welcome-statement">Welcome to Dialogue Buddy.</p>
             <p className="welcome-desc">
               Sign in or create an account to organize notes on books, draft essays, and track ideas.
             </p>

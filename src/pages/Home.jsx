@@ -31,9 +31,9 @@ export default function Home() {
   return (
     <div className="books-page single-page">
       <header className="books-header">
-        <h1>Book notes</h1>
+        <h1>Book Workspace</h1>
         <p className="books-desc">
-          Add a book, then add sections under it (e.g. Book 1, Book 2, …). For each section add events, questions, arguments, and notes.
+          Add a book (Title, Author, Translator). Each book gets Book Overview (with Summary notes, Key concepts, Quotations, Questions, Implications), Character index, Concept index, and Argument map.
         </p>
       </header>
 
@@ -78,14 +78,14 @@ export default function Home() {
           </form>
         ) : (
           <button type="button" className="btn btn-primary" onClick={() => setAdding(true)}>
-            Add entry (book)
+            Add book
           </button>
         )}
       </section>
 
       <section className="books-list-section">
         {books.length === 0 ? (
-          <p className="empty-hint">No book notes yet. Add an entry above to create a book, then add sections and notes.</p>
+          <p className="empty-hint">No workspaces yet. Add a book above to create a workspace with Book Overview, Character index, Concept index, and Argument map.</p>
         ) : (
           <div className="book-list">
             {books.map(book => (

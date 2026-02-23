@@ -10,8 +10,8 @@ import {
   addSubentry,
   updateSubentry,
   deleteSubentry,
-  addCustomType,
   NOTE_TYPES,
+  BOOK_OVERVIEW_NOTE_TYPES,
 } from '../data/books'
 
 export function SectionBlock({
@@ -19,22 +19,19 @@ export function SectionBlock({
   section,
   sectionIndex,
   sectionCount,
-  newEntry,
-  setNewEntry,
+  newEntryByKey,
+  setNewEntryByKey,
   editingNote,
   setEditingNote,
   newSubentryByKey,
   setNewSubentryByKey,
   editingSubentry,
   setEditingSubentry,
-  newCustomTypeLabel,
-  setNewCustomTypeLabel,
   onMutate,
 }) {
   const [editingSectionTitle, setEditingSectionTitle] = useState(false)
   const [sectionTitleValue, setSectionTitleValue] = useState(section.title)
   const book = getBookById(bookId)
-  const customTypes = book?.customTypes || []
   useEffect(() => {
     setSectionTitleValue(section.title)
   }, [section.title])
@@ -56,30 +53,51 @@ export function SectionBlock({
     moveSection(bookId, section.id, dir)
     onMutate?.()
   }
-  const handleAddCustomType = () => {
-    const label = (typeof newCustomTypeLabel === 'string' ? newCustomTypeLabel : '').trim()
-    if (label) {
-      const added = addCustomType(bookId, label)
-      if (added) setNewEntry(prev => prev ? { ...prev, type: added.id } : null)
-      setNewCustomTypeLabel(undefined)
-      onMutate?.()
-    }
-  }
 
-  const handleAddEntry = (e) => {
+  const handleAddEntry = (e, typeId) => {
     e.preventDefault()
-    const content = (newEntry?.content ?? '').trim()
-    const type = newEntry?.type ?? 'note'
+    const key = `${section.id}-${typeId}`
+    const content = (newEntryByKey?.[key]?.content ?? '').trim()
     if (content) {
-      addNote(bookId, section.id, type, content)
-      setNewEntry(null)
+      addNote(bookId, section.id, typeId, content)
+      setNewEntryByKey(prev => {
+        const next = { ...prev }
+        delete next[key]
+        return next
+      })
       onMutate?.()
     }
   }
-  const startAddEntry = () => setNewEntry({ type: 'note', content: '' })
-  const cancelAddEntry = () => setNewEntry(null)
+  const startAddEntry = (typeId) => setNewEntryByKey(prev => ({ ...prev, [`${section.id}-${typeId}`]: { type: typeId, content: '' } }))
+  const cancelAddEntry = (typeId) => setNewEntryByKey(prev => {
+    const next = { ...prev }
+    delete next[`${section.id}-${typeId}`]
+    return next
+  })
 
   const notes = section.notes || []
+  const isBookOverview = section.title === 'Book Overview'
+  const keyNote = `${section.id}-note`
+
+  const handleAddFlatEntry = (e) => {
+    e.preventDefault()
+    const content = (newEntryByKey?.[keyNote]?.content ?? '').trim()
+    if (content) {
+      addNote(bookId, section.id, 'note', content)
+      setNewEntryByKey(prev => {
+        const next = { ...prev }
+        delete next[keyNote]
+        return next
+      })
+      onMutate?.()
+    }
+  }
+  const startAddFlatEntry = () => setNewEntryByKey(prev => ({ ...prev, [keyNote]: { type: 'note', content: '' } }))
+  const cancelAddFlatEntry = () => setNewEntryByKey(prev => {
+    const next = { ...prev }
+    delete next[keyNote]
+    return next
+  })
 
   return (
     <section className="section-block">
@@ -108,79 +126,93 @@ export function SectionBlock({
         <button type="button" className="btn-icon danger" onClick={handleDeleteSection}>Delete section</button>
       </div>
 
-      <div className="entries-list">
-        {notes.map(note => (
-          <EntryItem
-            key={note.id}
-            bookId={bookId}
-            sectionId={section.id}
-            note={note}
-            customTypes={customTypes}
-            editingNote={editingNote}
-            setEditingNote={setEditingNote}
-            newSubentry={newSubentryByKey[note.id]}
-            setNewSubentry={c => setNewSubentryByKey(prev => ({ ...prev, [note.id]: c }))}
-            editingSubentry={editingSubentry}
-            setEditingSubentry={setEditingSubentry}
-            onMutate={onMutate}
-          />
-        ))}
-        {newEntry ? (
-          <form onSubmit={handleAddEntry} className="entry-add-form">
-            <div className="entry-add-type">
-              <label className="entry-type-label">Type:</label>
-              <select
-                value={newEntry.type || 'note'}
-                onChange={e => setNewEntry({ ...newEntry, type: e.target.value })}
-                className="form-input entry-type-select"
-              >
-                {NOTE_TYPES.map(t => (
-                  <option key={t.id} value={t.id}>{t.label}</option>
-                ))}
-                {customTypes.map(t => (
-                  <option key={t.id} value={t.id}>{t.label}</option>
-                ))}
-              </select>
-            </div>
-            {newCustomTypeLabel !== undefined ? (
-              <div className="entry-add-custom-type">
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="New type name"
-                  value={newCustomTypeLabel}
-                  onChange={e => setNewCustomTypeLabel(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAddCustomType())}
-                  autoFocus
-                />
-                <div className="note-edit-actions">
-                  <button type="button" className="btn-icon" onClick={() => setNewCustomTypeLabel(undefined)}>Cancel</button>
-                  <button type="button" className="btn btn-primary btn-sm" onClick={handleAddCustomType}>Add type</button>
+      {isBookOverview ? (
+        <div className="entries-by-type">
+          {BOOK_OVERVIEW_NOTE_TYPES.map(({ id: typeId, label }) => {
+            const typeNotes = notes.filter(n => n.type === typeId)
+            const key = `${section.id}-${typeId}`
+            const newEntry = newEntryByKey?.[key]
+            return (
+              <div key={typeId} className="entry-type-group">
+                <h4 className="entry-type-group-title">{label}</h4>
+                <div className="entries-list">
+                  {typeNotes.map(note => (
+                    <EntryItem
+                      key={note.id}
+                      bookId={bookId}
+                      sectionId={section.id}
+                      note={note}
+                      editingNote={editingNote}
+                      setEditingNote={setEditingNote}
+                      newSubentry={newSubentryByKey?.[note.id]}
+                      setNewSubentry={c => setNewSubentryByKey(prev => ({ ...prev, [note.id]: c }))}
+                      editingSubentry={editingSubentry}
+                      setEditingSubentry={setEditingSubentry}
+                      onMutate={onMutate}
+                    />
+                  ))}
+                  {newEntry ? (
+                    <form onSubmit={e => handleAddEntry(e, typeId)} className="entry-add-form">
+                      <textarea
+                        className="form-input note-edit-textarea"
+                        placeholder={`Add ${label.toLowerCase()}…`}
+                        value={newEntry.content || ''}
+                        onChange={e => setNewEntryByKey(prev => ({ ...prev, [key]: { type: typeId, content: e.target.value } }))}
+                        rows={2}
+                      />
+                      <div className="note-edit-actions">
+                        <button type="button" className="btn-icon" onClick={() => cancelAddEntry(typeId)}>Cancel</button>
+                        <button type="submit" className="btn btn-primary btn-sm">Add</button>
+                      </div>
+                    </form>
+                  ) : (
+                    <button type="button" className="btn-icon add-note-btn" onClick={() => startAddEntry(typeId)}>
+                      + Add {label.toLowerCase()}
+                    </button>
+                  )}
                 </div>
               </div>
-            ) : (
-              <button type="button" className="btn-icon add-note-btn" onClick={() => setNewCustomTypeLabel('')}>
-                + Create new type
-              </button>
-            )}
-            <textarea
-              className="form-input note-edit-textarea"
-              placeholder="Content…"
-              value={newEntry.content || ''}
-              onChange={e => setNewEntry({ ...newEntry, content: e.target.value })}
-              rows={2}
+            )
+          })}
+        </div>
+      ) : (
+        <div className="entries-list">
+          {notes.map(note => (
+            <EntryItem
+              key={note.id}
+              bookId={bookId}
+              sectionId={section.id}
+              note={note}
+              editingNote={editingNote}
+              setEditingNote={setEditingNote}
+              newSubentry={newSubentryByKey?.[note.id]}
+              setNewSubentry={c => setNewSubentryByKey(prev => ({ ...prev, [note.id]: c }))}
+              editingSubentry={editingSubentry}
+              setEditingSubentry={setEditingSubentry}
+              onMutate={onMutate}
             />
-            <div className="note-edit-actions">
-              <button type="button" className="btn-icon" onClick={cancelAddEntry}>Cancel</button>
-              <button type="submit" className="btn btn-primary btn-sm">Add entry</button>
-            </div>
-          </form>
-        ) : (
-          <button type="button" className="btn-icon add-note-btn" onClick={startAddEntry}>
-            + Add entry
-          </button>
-        )}
-      </div>
+          ))}
+          {newEntryByKey?.[keyNote] !== undefined ? (
+            <form onSubmit={handleAddFlatEntry} className="entry-add-form">
+              <textarea
+                className="form-input note-edit-textarea"
+                placeholder="Add note…"
+                value={newEntryByKey[keyNote]?.content || ''}
+                onChange={e => setNewEntryByKey(prev => ({ ...prev, [keyNote]: { type: 'note', content: e.target.value } }))}
+                rows={2}
+              />
+              <div className="note-edit-actions">
+                <button type="button" className="btn-icon" onClick={cancelAddFlatEntry}>Cancel</button>
+                <button type="submit" className="btn btn-primary btn-sm">Add entry</button>
+              </div>
+            </form>
+          ) : (
+            <button type="button" className="btn-icon add-note-btn" onClick={startAddFlatEntry}>
+              + Add entry
+            </button>
+          )}
+        </div>
+      )}
     </section>
   )
 }
@@ -189,7 +221,6 @@ export function EntryItem({
   bookId,
   sectionId,
   note,
-  customTypes = [],
   editingNote,
   setEditingNote,
   newSubentry,
@@ -198,9 +229,7 @@ export function EntryItem({
   setEditingSubentry,
   onMutate,
 }) {
-  const typeLabel = NOTE_TYPES.find(t => t.id === note.type)?.label
-    ?? customTypes.find(t => t.id === note.type)?.label
-    ?? (note.type?.startsWith('custom-') ? 'Other' : note.type)
+  const typeLabel = NOTE_TYPES.find(t => t.id === note.type)?.label ?? note.type ?? 'Note'
   const subentries = note.subentries || []
 
   return (

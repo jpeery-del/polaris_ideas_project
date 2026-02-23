@@ -105,11 +105,22 @@ function loadBooks() {
             collapsed: !!q.collapsed,
           }))
         : []
+      // Philosophical Analysis tab: user-added expandable sections (rich-text, auto-save)
+      const philosophicalAnalysisSections = Array.isArray(book.philosophicalAnalysisSections)
+        ? book.philosophicalAnalysisSections.map((s, i) => ({
+            id: s.id || crypto.randomUUID(),
+            title: (s.title ?? '').trim() || 'Untitled',
+            content: s.content ?? '',
+            collapsed: !!s.collapsed,
+            order: s.order ?? i,
+          }))
+        : []
       return {
         ...book,
         summaryChapters,
         keyArguments,
         quotations,
+        philosophicalAnalysisSections,
         author: book.author ?? '',
         translator: book.translator ?? '',
         publisher: book.publisher ?? '',
@@ -187,6 +198,7 @@ export function createBook(opts) {
     tabContent: defaultTabContent(),
     keyArguments: [],
     quotations: [],
+    philosophicalAnalysisSections: [],
     createdAt: new Date().toISOString(),
   }
   saveBook(book)
@@ -591,4 +603,46 @@ export function formatQuotationCitation(quotation, book, style = 'plain') {
     if (src) parts.push(`— ${src}`)
   }
   return parts.join(' ')
+}
+
+// ——— Philosophical Analysis tab: user-added expandable sections (rich-text, auto-save) ———
+
+export function getPhilosophicalAnalysisSections(book) {
+  const raw = book?.philosophicalAnalysisSections
+  if (!Array.isArray(raw)) return []
+  return [...raw].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+}
+
+export function addPhilosophicalAnalysisSection(bookId) {
+  const book = getBookById(bookId)
+  if (!book) return null
+  const sections = getPhilosophicalAnalysisSections(book)
+  const section = {
+    id: crypto.randomUUID(),
+    title: '',
+    content: '',
+    collapsed: false,
+    order: sections.length,
+  }
+  saveBook({ ...book, philosophicalAnalysisSections: [...sections, section] })
+  return section
+}
+
+export function updatePhilosophicalAnalysisSection(bookId, sectionId, updates) {
+  const book = getBookById(bookId)
+  if (!book || !Array.isArray(book.philosophicalAnalysisSections)) return null
+  const philosophicalAnalysisSections = book.philosophicalAnalysisSections.map(s =>
+    s.id === sectionId ? { ...s, ...updates } : s
+  )
+  saveBook({ ...book, philosophicalAnalysisSections })
+  return getBookById(bookId)
+}
+
+export function deletePhilosophicalAnalysisSection(bookId, sectionId) {
+  const book = getBookById(bookId)
+  if (!book || !Array.isArray(book.philosophicalAnalysisSections)) return null
+  const sections = book.philosophicalAnalysisSections.filter(s => s.id !== sectionId)
+  sections.forEach((s, i) => { s.order = i })
+  saveBook({ ...book, philosophicalAnalysisSections: sections })
+  return getBookById(bookId)
 }

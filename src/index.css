@@ -1065,6 +1065,140 @@ button {
   margin-bottom: 0.25rem;
 }
 
+/* Philosophical Analysis tab: expandable sections, rich text, auto-save */
+.phil-analysis-tab {
+  margin-top: 0.5rem;
+}
+.phil-analysis-intro {
+  margin: 0 0 1.25rem;
+  font-size: 0.95rem;
+  color: var(--accent-light);
+  line-height: 1.5;
+}
+.phil-analysis-toolbar {
+  margin-bottom: 1.25rem;
+}
+.phil-analysis-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.phil-analysis-empty {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--accent-light);
+  font-style: italic;
+  background: rgba(107, 83, 68, 0.06);
+  border-radius: 8px;
+  border: 1px dashed var(--border);
+}
+.phil-analysis-section {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px var(--shadow);
+  overflow: hidden;
+}
+.phil-analysis-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  min-height: 2.75rem;
+}
+.phil-analysis-toggle {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+  background: none;
+  border: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  min-width: 0;
+}
+.phil-analysis-toggle:hover {
+  outline: none;
+}
+.phil-analysis-chevron {
+  font-size: 0.7rem;
+  color: var(--accent-light);
+  flex-shrink: 0;
+}
+.phil-analysis-title-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.2rem 0.4rem;
+  font-family: var(--serif);
+  font-size: 1rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+}
+.phil-analysis-title-input:focus {
+  outline: none;
+  border-color: var(--border);
+  background: var(--paper);
+}
+.phil-analysis-title-input::placeholder {
+  color: var(--accent-light);
+  font-weight: 500;
+}
+.phil-analysis-delete {
+  flex-shrink: 0;
+}
+.phil-analysis-body {
+  border-top: 1px solid var(--border);
+  padding: 1rem;
+}
+.phil-analysis-rich-editor {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--paper);
+}
+.phil-analysis-rich-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--paper-warm);
+}
+.phil-analysis-toolbar-btn {
+  padding: 0.25rem 0.5rem;
+  min-width: 2rem;
+}
+.phil-analysis-autosave-hint {
+  font-size: 0.8rem;
+  color: var(--accent-light);
+  margin-left: 0.5rem;
+}
+.phil-analysis-rich-content {
+  min-height: 120px;
+  padding: 0.6rem 0.75rem;
+  font-family: var(--sans);
+  font-size: 1rem;
+  line-height: 1.6;
+  outline: none;
+}
+.phil-analysis-rich-content[contenteditable]:empty::before,
+.phil-analysis-rich-content[contenteditable][data-placeholder]:empty::before {
+  content: attr(data-placeholder);
+  color: var(--accent-light);
+}
+.phil-analysis-rich-content ul {
+  margin: 0.5rem 0 0.5rem 1.25rem;
+  padding: 0;
+}
+.phil-analysis-rich-content li {
+  margin-bottom: 0.25rem;
+}
+
 /* Key Arguments tab: structured argument cards (logical analysis) */
 .key-args-tab {
   margin-top: 0.5rem;

@@ -467,6 +467,154 @@ button {
   color: var(--ink);
 }
 
+/* Thesis Builder tab */
+.essay-thesis-builder-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 0.5rem;
+}
+.essay-thesis-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.essay-thesis-textarea {
+  min-height: 0;
+}
+.essay-thesis-working-input {
+  max-width: 100%;
+}
+.essay-thesis-checklist {
+  margin-top: 0.5rem;
+  padding: 1rem;
+  background: var(--paper-warm);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.essay-thesis-checklist-heading {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem;
+  color: var(--accent);
+}
+.essay-thesis-checklist-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  color: var(--ink);
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+}
+.essay-thesis-checklist-item:last-child {
+  margin-bottom: 0;
+}
+.essay-thesis-checklist-item input[type="checkbox"] {
+  width: 1.1rem;
+  height: 1.1rem;
+  accent-color: var(--accent);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* Outline tab */
+.essay-outline-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-top: 0.5rem;
+}
+.essay-outline-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.essay-outline-section-heading {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--accent);
+}
+.essay-outline-section-head-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.essay-outline-section-head-row .essay-outline-section-heading {
+  margin: 0;
+}
+.essay-outline-section-desc {
+  font-size: 0.9rem;
+  color: var(--accent-light);
+  margin: -0.25rem 0 0;
+}
+.essay-outline-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.essay-outline-textarea {
+  min-height: 0;
+  resize: vertical;
+}
+.essay-outline-empty-hint {
+  font-size: 0.9rem;
+  color: var(--accent-light);
+  margin: 0.5rem 0 0;
+}
+.essay-outline-body-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.essay-outline-body-block {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--paper-warm);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.essay-outline-body-block-drop-target {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(107, 83, 68, 0.2);
+}
+.essay-outline-body-block-dragging {
+  opacity: 0.6;
+}
+.essay-outline-drag-handle {
+  cursor: grab;
+  color: var(--accent-light);
+  font-size: 0.9rem;
+  padding: 0.25rem 0.35rem;
+  user-select: none;
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+.essay-outline-drag-handle:active {
+  cursor: grabbing;
+}
+.essay-outline-body-fields {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.essay-outline-body-remove {
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
 /* Home */
 .home {
   padding-bottom: 3rem;

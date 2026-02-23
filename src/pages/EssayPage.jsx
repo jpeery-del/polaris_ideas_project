@@ -9,18 +9,94 @@ import {
   ESSAY_STATUSES,
 } from '../data/essays'
 
+const DEFAULT_THESIS_BUILDER = {
+  myAnswer: '',
+  whyItMatters: '',
+  whoDisagrees: '',
+  stakesIfRight: '',
+  stakesIfWrong: '',
+  workingThesis: '',
+  checklist: { answersPrompt: false, specific: false, arguable: false },
+}
+
+function parseThesisBuilder(raw) {
+  if (typeof raw !== 'string' || !raw.trim()) return DEFAULT_THESIS_BUILDER
+  try {
+    const parsed = JSON.parse(raw)
+    return {
+      ...DEFAULT_THESIS_BUILDER,
+      ...parsed,
+      checklist: { ...DEFAULT_THESIS_BUILDER.checklist, ...(parsed.checklist || {}) },
+    }
+  } catch {
+    return DEFAULT_THESIS_BUILDER
+  }
+}
+
+function createBodyParagraph() {
+  return {
+    id: crypto.randomUUID(),
+    paragraphClaim: '',
+    evidence: '',
+    analysis: '',
+    counterargument: '',
+    response: '',
+  }
+}
+
+const DEFAULT_OUTLINE = {
+  introduction: { hook: '', context: '', thesis: '' },
+  bodyParagraphs: [],
+  objectionSection: '',
+  conclusion: { restateThesis: '', broaderImplication: '', whyItMatters: '' },
+}
+
+function parseOutline(raw) {
+  if (typeof raw !== 'string' || !raw.trim()) return DEFAULT_OUTLINE
+  try {
+    const parsed = JSON.parse(raw)
+    const intro = { ...DEFAULT_OUTLINE.introduction, ...(parsed.introduction || {}) }
+    const body = Array.isArray(parsed.bodyParagraphs)
+      ? parsed.bodyParagraphs.map((p) => ({
+          ...createBodyParagraph(),
+          ...p,
+          id: p.id || crypto.randomUUID(),
+        }))
+      : []
+    const conclusion = { ...DEFAULT_OUTLINE.conclusion, ...(parsed.conclusion || {}) }
+    return {
+      introduction: intro,
+      bodyParagraphs: body,
+      objectionSection: typeof parsed.objectionSection === 'string' ? parsed.objectionSection : '',
+      conclusion,
+    }
+  } catch {
+    return DEFAULT_OUTLINE
+  }
+}
+
 export default function EssayPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const [version, setVersion] = useState(0)
   const [activeTab, setActiveTab] = useState(ESSAY_TAB_KEYS[0])
   const [tabValue, setTabValue] = useState('')
+  const [thesisData, setThesisData] = useState(DEFAULT_THESIS_BUILDER)
+  const [outlineData, setOutlineData] = useState(DEFAULT_OUTLINE)
+  const [outlineDragState, setOutlineDragState] = useState({ draggingId: null, dropTargetIndex: null })
 
   const essay = getEssayById(id)
 
   useEffect(() => {
     if (essay?.tabContent && activeTab) {
-      setTabValue(essay.tabContent[activeTab] ?? '')
+      const value = essay.tabContent[activeTab] ?? ''
+      setTabValue(value)
+      if (activeTab === 'thesisBuilder') {
+        setThesisData(parseThesisBuilder(value))
+      }
+      if (activeTab === 'outline') {
+        setOutlineData(parseOutline(value))
+      }
     }
   }, [essay?.id, activeTab, version])
 
@@ -47,6 +123,122 @@ export default function EssayPage() {
       },
     })
     refresh()
+  }
+
+  const handleThesisChange = (next) => {
+    setThesisData(next)
+    const str = JSON.stringify(next)
+    setTabValue(str)
+    saveEssay({
+      ...current,
+      tabContent: {
+        ...(current.tabContent || {}),
+        thesisBuilder: str,
+      },
+    })
+    refresh()
+  }
+
+  const handleThesisField = (field, value) => {
+    handleThesisChange({ ...thesisData, [field]: value })
+  }
+
+  const handleThesisChecklist = (key, checked) => {
+    handleThesisChange({
+      ...thesisData,
+      checklist: { ...thesisData.checklist, [key]: checked },
+    })
+  }
+
+  const handleOutlineChange = (next) => {
+    setOutlineData(next)
+    const str = JSON.stringify(next)
+    setTabValue(str)
+    saveEssay({
+      ...current,
+      tabContent: {
+        ...(current.tabContent || {}),
+        outline: str,
+      },
+    })
+    refresh()
+  }
+
+  const handleOutlineIntro = (field, value) => {
+    handleOutlineChange({
+      ...outlineData,
+      introduction: { ...outlineData.introduction, [field]: value },
+    })
+  }
+
+  const handleOutlineConclusion = (field, value) => {
+    handleOutlineChange({
+      ...outlineData,
+      conclusion: { ...outlineData.conclusion, [field]: value },
+    })
+  }
+
+  const handleOutlineObjectionSection = (value) => {
+    handleOutlineChange({ ...outlineData, objectionSection: value })
+  }
+
+  const handleOutlineBodyUpdate = (index, updates) => {
+    const body = outlineData.bodyParagraphs.map((p, i) =>
+      i === index ? { ...p, ...updates } : p
+    )
+    handleOutlineChange({ ...outlineData, bodyParagraphs: body })
+  }
+
+  const handleOutlineBodyAdd = () => {
+    handleOutlineChange({
+      ...outlineData,
+      bodyParagraphs: [...outlineData.bodyParagraphs, createBodyParagraph()],
+    })
+  }
+
+  const handleOutlineBodyRemove = (index) => {
+    handleOutlineChange({
+      ...outlineData,
+      bodyParagraphs: outlineData.bodyParagraphs.filter((_, i) => i !== index),
+    })
+    setOutlineDragState({ draggingId: null, dropTargetIndex: null })
+  }
+
+  const handleOutlineBodyReorder = (fromIndex, toIndex) => {
+    const body = [...outlineData.bodyParagraphs]
+    if (fromIndex < 0 || toIndex < 0 || fromIndex >= body.length || toIndex >= body.length) return
+    const [removed] = body.splice(fromIndex, 1)
+    body.splice(toIndex, 0, removed)
+    handleOutlineChange({ ...outlineData, bodyParagraphs: body })
+    setOutlineDragState({ draggingId: null, dropTargetIndex: null })
+  }
+
+  const handleOutlineDragStart = (e, index) => {
+    const block = outlineData.bodyParagraphs[index]
+    if (!block) return
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData('text/plain', block.id)
+    setOutlineDragState({ draggingId: block.id, dropTargetIndex: null })
+  }
+
+  const handleOutlineDragOver = (e, index) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+    const id = outlineDragState.draggingId
+    const block = outlineData.bodyParagraphs[index]
+    if (block && block.id !== id) setOutlineDragState((s) => ({ ...s, dropTargetIndex: index }))
+  }
+
+  const handleOutlineDrop = (e, toIndex) => {
+    e.preventDefault()
+    const id = e.dataTransfer.getData('text/plain')
+    const fromIndex = outlineData.bodyParagraphs.findIndex((p) => p.id === id)
+    if (fromIndex >= 0) handleOutlineBodyReorder(fromIndex, toIndex)
+    setOutlineDragState({ draggingId: null, dropTargetIndex: null })
+  }
+
+  const handleOutlineDragEnd = () => {
+    setOutlineDragState({ draggingId: null, dropTargetIndex: null })
   }
 
   const handleStatusChange = (newStatus) => {
@@ -142,6 +334,306 @@ export default function EssayPage() {
               placeholder="Break down the prompt, key terms, and requirements…"
               rows={14}
             />
+          </div>
+        ) : activeTab === 'thesisBuilder' ? (
+          <div className="essay-thesis-builder-tab">
+            <div className="essay-thesis-field">
+              <label className="form-label" htmlFor="thesis-my-answer">
+                My Answer (main claim)
+              </label>
+              <textarea
+                id="thesis-my-answer"
+                className="form-input essay-workspace-textarea essay-thesis-textarea"
+                value={thesisData.myAnswer}
+                onChange={(e) => handleThesisField('myAnswer', e.target.value)}
+                placeholder="Your main claim in a sentence or two…"
+                rows={3}
+              />
+            </div>
+            <div className="essay-thesis-field">
+              <label className="form-label" htmlFor="thesis-why-matters">
+                Why It Matters
+              </label>
+              <textarea
+                id="thesis-why-matters"
+                className="form-input essay-workspace-textarea essay-thesis-textarea"
+                value={thesisData.whyItMatters}
+                onChange={(e) => handleThesisField('whyItMatters', e.target.value)}
+                placeholder="Why this question or claim matters…"
+                rows={3}
+              />
+            </div>
+            <div className="essay-thesis-field">
+              <label className="form-label" htmlFor="thesis-who-disagrees">
+                Who Disagrees
+              </label>
+              <textarea
+                id="thesis-who-disagrees"
+                className="form-input essay-workspace-textarea essay-thesis-textarea"
+                value={thesisData.whoDisagrees}
+                onChange={(e) => handleThesisField('whoDisagrees', e.target.value)}
+                placeholder="Who might disagree, and what do they believe?"
+                rows={3}
+              />
+            </div>
+            <div className="essay-thesis-field">
+              <label className="form-label" htmlFor="thesis-stakes-right">
+                Stakes If I'm Right
+              </label>
+              <textarea
+                id="thesis-stakes-right"
+                className="form-input essay-workspace-textarea essay-thesis-textarea"
+                value={thesisData.stakesIfRight}
+                onChange={(e) => handleThesisField('stakesIfRight', e.target.value)}
+                placeholder="What follows if your claim is correct?"
+                rows={2}
+              />
+            </div>
+            <div className="essay-thesis-field">
+              <label className="form-label" htmlFor="thesis-stakes-wrong">
+                Stakes If I'm Wrong
+              </label>
+              <textarea
+                id="thesis-stakes-wrong"
+                className="form-input essay-workspace-textarea essay-thesis-textarea"
+                value={thesisData.stakesIfWrong}
+                onChange={(e) => handleThesisField('stakesIfWrong', e.target.value)}
+                placeholder="What follows if your claim is incorrect?"
+                rows={2}
+              />
+            </div>
+            <div className="essay-thesis-field">
+              <label className="form-label" htmlFor="thesis-working">
+                Working Thesis Statement (single sentence)
+              </label>
+              <input
+                id="thesis-working"
+                type="text"
+                className="form-input essay-thesis-working-input"
+                value={thesisData.workingThesis}
+                onChange={(e) => handleThesisField('workingThesis', e.target.value)}
+                placeholder="One clear, arguable sentence that states your thesis."
+              />
+            </div>
+            <div className="essay-thesis-checklist">
+              <h3 className="essay-thesis-checklist-heading">Logical integrity</h3>
+              <label className="essay-thesis-checklist-item">
+                <input
+                  type="checkbox"
+                  checked={thesisData.checklist.answersPrompt}
+                  onChange={(e) => handleThesisChecklist('answersPrompt', e.target.checked)}
+                />
+                <span>Does this directly answer the prompt?</span>
+              </label>
+              <label className="essay-thesis-checklist-item">
+                <input
+                  type="checkbox"
+                  checked={thesisData.checklist.specific}
+                  onChange={(e) => handleThesisChecklist('specific', e.target.checked)}
+                />
+                <span>Is it specific?</span>
+              </label>
+              <label className="essay-thesis-checklist-item">
+                <input
+                  type="checkbox"
+                  checked={thesisData.checklist.arguable}
+                  onChange={(e) => handleThesisChecklist('arguable', e.target.checked)}
+                />
+                <span>Is it arguable?</span>
+              </label>
+            </div>
+          </div>
+        ) : activeTab === 'outline' ? (
+          <div
+            className="essay-outline-tab"
+            onDragOver={(e) => e.preventDefault()}
+            onDragLeave={() => setOutlineDragState((s) => ({ ...s, dropTargetIndex: null }))}
+            onDragEnd={handleOutlineDragEnd}
+          >
+            <section className="essay-outline-section">
+              <h3 className="essay-outline-section-heading">Introduction</h3>
+              <div className="essay-outline-field">
+                <label className="form-label" htmlFor="outline-intro-hook">Hook</label>
+                <textarea
+                  id="outline-intro-hook"
+                  className="form-input form-textarea essay-outline-textarea"
+                  value={outlineData.introduction.hook}
+                  onChange={(e) => handleOutlineIntro('hook', e.target.value)}
+                  placeholder="Opening that draws the reader in…"
+                  rows={2}
+                />
+              </div>
+              <div className="essay-outline-field">
+                <label className="form-label" htmlFor="outline-intro-context">Context</label>
+                <textarea
+                  id="outline-intro-context"
+                  className="form-input form-textarea essay-outline-textarea"
+                  value={outlineData.introduction.context}
+                  onChange={(e) => handleOutlineIntro('context', e.target.value)}
+                  placeholder="Background the reader needs…"
+                  rows={2}
+                />
+              </div>
+              <div className="essay-outline-field">
+                <label className="form-label" htmlFor="outline-intro-thesis">Thesis</label>
+                <textarea
+                  id="outline-intro-thesis"
+                  className="form-input form-textarea essay-outline-textarea"
+                  value={outlineData.introduction.thesis}
+                  onChange={(e) => handleOutlineIntro('thesis', e.target.value)}
+                  placeholder="Your main claim (one sentence)."
+                  rows={2}
+                />
+              </div>
+            </section>
+
+            <section className="essay-outline-section">
+              <div className="essay-outline-section-head-row">
+                <h3 className="essay-outline-section-heading">Body paragraphs</h3>
+                <button type="button" className="btn btn-sm btn-primary" onClick={handleOutlineBodyAdd}>
+                  + Add paragraph
+                </button>
+              </div>
+              {outlineData.bodyParagraphs.length === 0 ? (
+                <p className="essay-outline-empty-hint">No body paragraphs yet. Add one to start outlining.</p>
+              ) : (
+                <ul className="essay-outline-body-list">
+                  {outlineData.bodyParagraphs.map((block, index) => {
+                    const isDragging = outlineDragState.draggingId === block.id
+                    const isDropTarget = outlineDragState.dropTargetIndex === index
+                    return (
+                      <li
+                        key={block.id}
+                        className={`essay-outline-body-block ${isDragging ? 'essay-outline-body-block-dragging' : ''} ${isDropTarget ? 'essay-outline-body-block-drop-target' : ''}`}
+                        onDragOver={(e) => handleOutlineDragOver(e, index)}
+                        onDrop={(e) => handleOutlineDrop(e, index)}
+                      >
+                        <span
+                          className="essay-outline-drag-handle"
+                          draggable
+                          title="Drag to reorder"
+                          onDragStart={(e) => handleOutlineDragStart(e, index)}
+                          aria-hidden
+                        >
+                          ⋮⋮
+                        </span>
+                        <div className="essay-outline-body-fields">
+                          <div className="essay-outline-field">
+                            <label className="form-label">Paragraph claim</label>
+                            <textarea
+                              className="form-input form-textarea essay-outline-textarea"
+                              value={block.paragraphClaim}
+                              onChange={(e) => handleOutlineBodyUpdate(index, { paragraphClaim: e.target.value })}
+                              placeholder="Main claim for this paragraph."
+                              rows={2}
+                            />
+                          </div>
+                          <div className="essay-outline-field">
+                            <label className="form-label">Evidence (link to quotation system)</label>
+                            <input
+                              type="text"
+                              className="form-input"
+                              value={block.evidence}
+                              onChange={(e) => handleOutlineBodyUpdate(index, { evidence: e.target.value })}
+                              placeholder="Book, page, or quotation reference."
+                            />
+                          </div>
+                          <div className="essay-outline-field">
+                            <label className="form-label">Analysis</label>
+                            <textarea
+                              className="form-input form-textarea essay-outline-textarea"
+                              value={block.analysis}
+                              onChange={(e) => handleOutlineBodyUpdate(index, { analysis: e.target.value })}
+                              placeholder="How the evidence supports the claim."
+                              rows={2}
+                            />
+                          </div>
+                          <div className="essay-outline-field">
+                            <label className="form-label">Counterargument</label>
+                            <textarea
+                              className="form-input form-textarea essay-outline-textarea"
+                              value={block.counterargument}
+                              onChange={(e) => handleOutlineBodyUpdate(index, { counterargument: e.target.value })}
+                              placeholder="Objection or opposing view."
+                              rows={2}
+                            />
+                          </div>
+                          <div className="essay-outline-field">
+                            <label className="form-label">Response</label>
+                            <textarea
+                              className="form-input form-textarea essay-outline-textarea"
+                              value={block.response}
+                              onChange={(e) => handleOutlineBodyUpdate(index, { response: e.target.value })}
+                              placeholder="Your reply to the counterargument."
+                              rows={2}
+                            />
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          className="btn btn-sm danger essay-outline-body-remove"
+                          onClick={() => handleOutlineBodyRemove(index)}
+                          title="Remove paragraph"
+                        >
+                          Remove
+                        </button>
+                      </li>
+                    )
+                  })}
+                </ul>
+              )}
+            </section>
+
+            <section className="essay-outline-section">
+              <h3 className="essay-outline-section-heading">Objection section</h3>
+              <p className="essay-outline-section-desc">Address major objections before the conclusion.</p>
+              <div className="essay-outline-field">
+                <textarea
+                  className="form-input form-textarea essay-outline-textarea"
+                  value={outlineData.objectionSection}
+                  onChange={(e) => handleOutlineObjectionSection(e.target.value)}
+                  placeholder="Outline how you will handle objections…"
+                  rows={4}
+                />
+              </div>
+            </section>
+
+            <section className="essay-outline-section">
+              <h3 className="essay-outline-section-heading">Conclusion</h3>
+              <div className="essay-outline-field">
+                <label className="form-label" htmlFor="outline-concl-restate">Restate thesis</label>
+                <textarea
+                  id="outline-concl-restate"
+                  className="form-input form-textarea essay-outline-textarea"
+                  value={outlineData.conclusion.restateThesis}
+                  onChange={(e) => handleOutlineConclusion('restateThesis', e.target.value)}
+                  placeholder="Rephrase your main claim."
+                  rows={2}
+                />
+              </div>
+              <div className="essay-outline-field">
+                <label className="form-label" htmlFor="outline-concl-broader">Broader implication</label>
+                <textarea
+                  id="outline-concl-broader"
+                  className="form-input form-textarea essay-outline-textarea"
+                  value={outlineData.conclusion.broaderImplication}
+                  onChange={(e) => handleOutlineConclusion('broaderImplication', e.target.value)}
+                  placeholder="What this implies more generally."
+                  rows={2}
+                />
+              </div>
+              <div className="essay-outline-field">
+                <label className="form-label" htmlFor="outline-concl-matters">Why it matters</label>
+                <textarea
+                  id="outline-concl-matters"
+                  className="form-input form-textarea essay-outline-textarea"
+                  value={outlineData.conclusion.whyItMatters}
+                  onChange={(e) => handleOutlineConclusion('whyItMatters', e.target.value)}
+                  placeholder="So what? Why should the reader care?"
+                  rows={2}
+                />
+              </div>
+            </section>
           </div>
         ) : (
           <textarea

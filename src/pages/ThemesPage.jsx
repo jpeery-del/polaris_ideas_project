@@ -174,7 +174,7 @@ export default function ThemesPage() {
       <header className="themes-index-header">
         <h1>Themes</h1>
         <p className="themes-index-desc">
-          Shared themes for cross-connecting books, quotations, and arguments. Click a theme to see all connected items. All linking is manual.
+          Shared themes for cross-connecting books, quotations, and arguments. Click a theme to see all connected items.
         </p>
         <div className="themes-index-actions">
           <input

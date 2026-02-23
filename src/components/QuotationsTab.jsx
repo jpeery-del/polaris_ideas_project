@@ -311,7 +311,7 @@ export default function QuotationsTab({ book, onRefresh }) {
   return (
     <div className="quotations-tab">
       <p className="quotations-tab-intro">
-        Record key quotations with page number, context, and why they matter. Add tags for themes. Copy citation-ready text; MLA/APA export coming later.
+        Record key quotations with page number, context, and why they matter. Add tags for themes.
       </p>
       <div className="quotations-toolbar">
         <button type="button" className="btn btn-primary" onClick={handleAddQuotation}>

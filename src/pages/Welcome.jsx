@@ -51,6 +51,7 @@ export default function Welcome() {
       <div className="welcome-hero">
         <h1 className="welcome-title">Dialogue Buddy</h1>
         <p className="welcome-tagline">Organize your reading and thinking.</p>
+        <p className="welcome-motto">Philosophy Is Hard. Studying It Shouldn't Be.</p>
 
         {user ? (
           <>

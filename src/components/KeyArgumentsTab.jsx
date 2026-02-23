@@ -271,7 +271,7 @@ export default function KeyArgumentsTab({ book, onRefresh }) {
   return (
     <div className="key-args-tab">
       <p className="key-args-tab-intro">
-        Record key arguments with a clear structure: claim, premises, conclusion, assumptions, and your analysis of strengths and weaknesses. Use this to train logical analysis—no AI generation.
+        Record key arguments with a clear structure: claim, premises, conclusion, assumptions, and your analysis of strengths and weaknesses. Use this to train logical analysis.
       </p>
       <div className="key-args-toolbar">
         <button type="button" className="btn btn-primary" onClick={handleAddArgument}>

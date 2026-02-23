@@ -339,7 +339,7 @@ export default function QuestionsObjectionsTab({ book, onRefresh }) {
   return (
     <div className="qo-tab">
       <p className="qo-tab-intro">
-        Sharpen your reading by recording questions and objections. Questions probe what is unclear or significant; objections target specific key arguments and help you weigh strength and response. Reorder by dragging. No AI—your own critical thinking.
+        Sharpen your reading by recording questions and objections. Questions probe what is unclear or significant; objections target specific key arguments and help you weigh strength and response. Reorder by dragging.
       </p>
 
       <section className="qo-section">

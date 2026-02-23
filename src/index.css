@@ -143,7 +143,14 @@ button {
 .welcome-tagline {
   font-size: 1.2rem;
   color: var(--accent);
+  margin: 0 0 0.5rem;
+}
+.welcome-motto {
+  font-size: 1.1rem;
+  color: var(--ink);
   margin: 0 0 1rem;
+  font-style: italic;
+  font-weight: 500;
 }
 .welcome-statement {
   font-size: 1.15rem;
